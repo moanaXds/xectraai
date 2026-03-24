@@ -1,0 +1,2203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>XectraAI- Know Exactly How Ready You Are</title>
+<meta name="google-site-verification" content="hCWcPGSQkaoxoaE-yvSp34dTNgalOorYQqy38FHYxuM"/>
+<meta name="description" content="XectraAI builds a personalised exam from your syllabus and tells you exactly what to fix. AI-powered exam preparation for every student."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+
+
+:root {
+  --cream: #FDFAF6;
+  --sand: #F5EFE4;
+  --sand-dark: #EDE4D4;
+  --terracotta: #E8724A;
+  --terracotta-light: #F5906F;
+  --terracotta-pale: #FDE8E0;
+  --sage: #7BAE8A;
+  --sage-light: #E8F2EB;
+  --charcoal: #2C2416;
+  --charcoal-mid: #4A3F32;
+  --charcoal-light: #7A6E62;
+  --white: #FFFFFF;
+  --card-bg: #FFF8F2;
+  --border: #EDE0D0;
+  --shadow-sm: 0 2px 8px rgba(44,36,22,0.06);
+  --shadow-md: 0 8px 24px rgba(44,36,22,0.10);
+  --shadow-lg: 0 16px 48px rgba(44,36,22,0.14);
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 24px;
+  --font-head: 'Plus Jakarta Sans', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --transition: 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+
+ 
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+html{scroll-behavior:smooth;font-size:16px;-webkit-overflow-scrolling:touch;}
+body{scroll-behavior:smooth;overscroll-behavior:none;}
+
+body{background:var(--cream);color:var(--charcoal);font-family:var(--font-body);min-height:100vh;overflow-x:hidden;}
+.page{display:none;opacity:0;transform:translateY(20px);transition:opacity 0.55s cubic-bezier(0.4,0,0.2,1), transform 0.55s cubic-bezier(0.4,0,0.2,1);}
+.page.active{display:block;opacity:1;transform:translateY(0);}
+
+/* ── SHARED UTILS ── */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:var(--radius-sm);font-family:var(--font-head);font-weight:700;font-size:1rem;cursor:pointer;border:none;transition:transform var(--transition), box-shadow var(--transition), background var(--transition);}
+.btn:hover{transform:translateY(-2px) scale(1.01);}
+.btn:active{transform:scale(0.98);}
+.btn-primary{background:var(--terracotta);color:#fff;box-shadow:0 4px 16px rgba(232,114,74,0.35);}
+.btn-primary:hover{background:var(--terracotta-light);box-shadow:0 10px 28px rgba(232,114,74,0.50);}
+.btn-outline{background:transparent;color:var(--terracotta);border:2px solid var(--terracotta);}
+.btn-outline:hover{background:var(--terracotta-pale);box-shadow:0 6px 18px rgba(232,114,74,0.18);}
+.btn-ghost{background:transparent;color:var(--charcoal-light);border:1.5px solid var(--border);font-size:0.88rem;padding:8px 16px;}
+.btn-ghost:hover{background:var(--sand);color:var(--charcoal);border-color:var(--sand-dark);}
+.container{max-width:1100px;margin:0 auto;padding:0 24px;}
+
+/* ── BACK BUTTON ── */
+.back-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.6);backdrop-filter:blur(8px);border:1.5px solid var(--border);border-radius:100px;padding:7px 16px;font-family:var(--font-head);font-weight:600;font-size:0.82rem;color:var(--charcoal-mid);cursor:pointer;transition:all var(--transition);text-decoration:none;}
+.back-btn:hover{background:var(--sand);border-color:var(--sand-dark);color:var(--charcoal);transform:translateX(-2px);}
+.back-btn svg{transition:transform var(--transition);}
+.back-btn:hover svg{transform:translateX(-2px);}
+
+/* ── GRAIN NOISE FILTER ── */
+.grain::after{content:'';position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:1;border-radius:inherit;}
+
+/* ════════════════════════════════
+   PAGE 1 — LANDING
+════════════════════════════════ */
+
+#page-landing{
+  position:relative;
+  overflow:hidden;
+  min-height:100vh;
+  width:100%;
+  background:linear-gradient(270deg,#E8724A,#F5906F,#F5EFE4,#7BAE8A,#FDE8E0);
+  background-size:300% 300%;
+  -webkit-animation:bg-pan-left 8s ease infinite;
+  animation:bg-pan-left 8s ease infinite;
+}
+
+.shapes-bg{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;}
+.shape{position:absolute;border-radius:50%;opacity:0.18;animation:drift linear infinite;}
+.shape-1{width:320px;height:320px;background:var(--terracotta);top:-80px;left:-100px;animation-duration:22s;animation-delay:0s;}
+.shape-2{width:200px;height:200px;background:var(--sage);top:30%;right:-60px;animation-duration:28s;animation-delay:-8s;}
+.shape-3{width:140px;height:140px;background:var(--sand-dark);bottom:10%;left:20%;animation-duration:18s;animation-delay:-4s;}
+.shape-4{width:260px;height:260px;background:var(--terracotta-pale);bottom:-80px;right:15%;animation-duration:24s;animation-delay:-12s;}
+.shape-5{width:100px;height:100px;background:var(--sage);top:15%;left:40%;animation-duration:32s;animation-delay:-6s;}
+@keyframes drift{
+  0%{transform:translate(0,0) rotate(0deg);}
+  33%{transform:translate(30px,-20px) rotate(120deg);}
+  66%{transform:translate(-20px,30px) rotate(240deg);}
+  100%{transform:translate(0,0) rotate(360deg);}
+}
+
+nav{position:relative;z-index:10;padding:24px 0;}
+nav .container{display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{
+  font-family:var(--font-head);font-weight:800;font-size:1.4rem;color:var(--charcoal);letter-spacing:-0.5px;
+  -webkit-animation:bounce-in-top 1.1s both;
+  animation:bounce-in-top 1.1s both;
+  animation-delay:0s;
+}
+.nav-logo span{color:var(--terracotta);}
+
+.hero{position:relative;z-index:5;min-height:88vh;display:flex;align-items:center;padding:60px 0;}
+.hero-inner{max-width:680px;}
+.hero-tag{
+  display:inline-block;background:var(--terracotta-pale);color:var(--terracotta);font-family:var(--font-head);font-weight:600;font-size:0.8rem;padding:6px 14px;border-radius:100px;letter-spacing:0.5px;margin-bottom:28px;text-transform:uppercase;
+  -webkit-animation:bounce-in-top 1.1s both;
+  animation:bounce-in-top 1.1s both;
+  animation-delay:0.1s;
+}
+.hero h1{
+  font-family:var(--font-head);font-size:clamp(2.4rem,5vw,4rem);font-weight:800;line-height:1.15;color:var(--charcoal);letter-spacing:-1.5px;margin-bottom:20px;
+  -webkit-animation:bounce-in-top 1.1s both;
+  animation:bounce-in-top 1.1s both;
+  animation-delay:0.3s;
+}
+.hero h1 em{color:var(--terracotta);font-style:normal;}
+.hero p{
+  font-size:1.15rem;line-height:1.7;color:var(--charcoal-mid);max-width:520px;margin-bottom:40px;
+  -webkit-animation:bounce-in-top 1.1s both;
+  animation:bounce-in-top 1.1s both;
+  animation-delay:0.5s;
+}
+.btn-cta{
+  position:relative;padding:16px 36px;font-size:1.1rem;
+  -webkit-animation:bounce-in-top 1.1s both;
+  animation:bounce-in-top 1.1s both;
+  animation-delay:0.7s;
+}
+.btn-cta::after{content:'';position:absolute;inset:-4px;border-radius:16px;border:2px solid var(--terracotta);opacity:0;animation:pulse-ring 2.4s ease infinite;}
+@keyframes pulse-ring{
+  0%{transform:scale(0.95);opacity:0.5;}
+  60%{transform:scale(1.08);opacity:0;}
+  100%{transform:scale(1.08);opacity:0;}
+}
+@keyframes fadeSlideUp{
+  from{opacity:0;transform:translateY(20px);}
+  to{opacity:1;transform:translateY(0);}
+}
+@keyframes popSelect{
+  0%{transform:scale(1);}
+  45%{transform:scale(1.03);}
+  100%{transform:scale(1);}
+}
+@-webkit-keyframes bounce-in-top{
+  0%{-webkit-transform:translateY(-500px);transform:translateY(-500px);-webkit-animation-timing-function:ease-in;animation-timing-function:ease-in;opacity:0;}
+  38%{-webkit-transform:translateY(0);transform:translateY(0);-webkit-animation-timing-function:ease-out;animation-timing-function:ease-out;opacity:1;}
+  55%{-webkit-transform:translateY(-65px);transform:translateY(-65px);-webkit-animation-timing-function:ease-in;animation-timing-function:ease-in;}
+  72%{-webkit-transform:translateY(0);transform:translateY(0);-webkit-animation-timing-function:ease-out;animation-timing-function:ease-out;}
+  81%{-webkit-transform:translateY(-28px);transform:translateY(-28px);-webkit-animation-timing-function:ease-in;animation-timing-function:ease-in;}
+  90%{-webkit-transform:translateY(0);transform:translateY(0);-webkit-animation-timing-function:ease-out;animation-timing-function:ease-out;}
+  95%{-webkit-transform:translateY(-8px);transform:translateY(-8px);-webkit-animation-timing-function:ease-in;animation-timing-function:ease-in;}
+  100%{-webkit-transform:translateY(0);transform:translateY(0);-webkit-animation-timing-function:ease-out;animation-timing-function:ease-out;}
+}
+@keyframes bounce-in-top{
+  0%{transform:translateY(-500px);animation-timing-function:ease-in;opacity:0;}
+  38%{transform:translateY(0);animation-timing-function:ease-out;opacity:1;}
+  55%{transform:translateY(-65px);animation-timing-function:ease-in;}
+  72%{transform:translateY(0);animation-timing-function:ease-out;}
+  81%{transform:translateY(-28px);animation-timing-function:ease-in;}
+  90%{transform:translateY(0);animation-timing-function:ease-out;}
+  95%{transform:translateY(-8px);animation-timing-function:ease-in;}
+  100%{transform:translateY(0);animation-timing-function:ease-out;}
+}
+@-webkit-keyframes bg-pan-left{
+  0%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
+}
+@keyframes bg-pan-left{
+  0%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
+}
+@-webkit-keyframes kenburns-bottom {
+  0% { -webkit-transform: scale(1) translateY(0); transform: scale(1) translateY(0); -webkit-transform-origin: 50% 84%; transform-origin: 50% 84%; }
+  100% { -webkit-transform: scale(1.25) translateY(15px); transform: scale(1.25) translateY(15px); -webkit-transform-origin: bottom; transform-origin: bottom; }
+}
+@keyframes kenburns-bottom {
+  0% { transform: scale(1) translateY(0); transform-origin: 50% 84%; }
+  100% { transform: scale(1.25) translateY(15px); transform-origin: bottom; }
+}
+@-webkit-keyframes kenburns-top {
+  0% { -webkit-transform: scale(1) translateY(0); transform: scale(1) translateY(0); -webkit-transform-origin: 50% 16%; transform-origin: 50% 16%; }
+  100% { -webkit-transform: scale(1.25) translateY(-15px); transform: scale(1.25) translateY(-15px); -webkit-transform-origin: top; transform-origin: top; }
+}
+@keyframes kenburns-top {
+  0% { transform: scale(1) translateY(0); transform-origin: 50% 16%; }
+  100% { transform: scale(1.25) translateY(-15px); transform-origin: top; }
+}
+
+.features{position:relative;z-index:5;padding:80px 0 100px;}
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;margin-top:20px;}
+.feature-card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:36px 32px;transition:transform var(--transition),box-shadow var(--transition);opacity:0;animation:fadeSlideUp 0.55s ease forwards;}
+.feature-card:nth-child(1){animation-delay:0.1s;}
+.feature-card:nth-child(2){animation-delay:0.22s;}
+.feature-card:nth-child(3){animation-delay:0.34s;}
+.feature-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-md);}
+.feat-icon{width:48px;height:48px;background:var(--cream);border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;border:1px solid var(--border);}
+.feature-card h3{font-family:var(--font-head);font-weight:700;font-size:1.15rem;margin-bottom:10px;color:var(--charcoal);}
+.feature-card p{color:var(--charcoal-light);line-height:1.6;font-size:0.95rem;}
+
+/* ════════════════════════════════
+   PAGE 2 — PROFILE SETUP
+════════════════════════════════ */
+#page-profile{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;}
+.profile-bg-layers{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.profile-watermark{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:clamp(80px,15vw,180px);color:#E8724A;opacity:0.045;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:0;pointer-events:none;white-space:nowrap;letter-spacing:-4px;animation:kenburns-top 10s ease-out infinite alternate;}
+.p-shape{position:fixed;border-radius:50%;pointer-events:none;z-index:0;opacity:0.09;}
+.p-shape-1{width:400px;height:400px;background:#E8724A;top:-100px;right:-100px;animation:kenburns-top 14s ease-out infinite alternate;}
+.p-shape-2{width:300px;height:300px;background:#7BAE8A;bottom:-80px;left:-80px;animation:kenburns-top 18s ease-out infinite alternate-reverse;}
+.p-shape-3{width:200px;height:200px;background:#F5906F;top:40%;left:-60px;animation:kenburns-top 22s ease-out infinite alternate;}
+.p-shape-4{width:250px;height:250px;background:#E8724A;bottom:20%;right:-60px;animation:kenburns-top 16s ease-out infinite alternate-reverse;}
+.step-bar{display:flex;align-items:center;gap:10px;margin-bottom:32px;}
+.step-item{display:flex;align-items:center;gap:8px;}
+.step-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:700;font-size:0.78rem;border:2px solid var(--border);}
+.step-dot.active{background:var(--terracotta);border-color:var(--terracotta);color:#fff;}
+.step-dot.done{background:var(--sage);border-color:var(--sage);color:#fff;}
+.step-dot.pending{background:var(--cream);color:var(--charcoal-light);}
+.step-line{width:40px;height:2px;background:var(--border);border-radius:2px;}
+.step-label{font-size:0.78rem;color:var(--charcoal-light);font-weight:500;}
+
+.profile-card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:44px 40px;width:100%;max-width:480px;box-shadow:var(--shadow-md);}
+.profile-card h2{font-family:var(--font-head);font-weight:800;font-size:1.6rem;margin-bottom:6px;color:var(--charcoal);}
+.profile-card .sub{color:var(--charcoal-light);margin-bottom:32px;font-size:0.95rem;line-height:1.5;}
+.form-group{margin-bottom:20px;}
+label{display:block;font-family:var(--font-head);font-weight:600;font-size:0.85rem;margin-bottom:8px;color:var(--charcoal-mid);}
+input[type=text],select,textarea{width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:0.95rem;color:var(--charcoal);background:var(--cream);transition:border-color var(--transition),box-shadow var(--transition);outline:none;appearance:none;}
+input[type=text]:focus,select:focus,textarea:focus{border-color:var(--terracotta);box-shadow:0 0 0 3px rgba(232,114,74,0.12);}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237A6E62' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:40px;cursor:pointer;}
+.pill-group{display:flex;flex-wrap:wrap;gap:8px;}
+.pill{padding:9px 18px;border-radius:100px;border:1.5px solid var(--border);font-family:var(--font-head);font-weight:600;font-size:0.85rem;cursor:pointer;transition:all var(--transition);background:var(--cream);color:var(--charcoal-mid);}
+.pill.selected{background:var(--terracotta);border-color:var(--terracotta);color:#fff;}
+.pill:hover:not(.selected){border-color:var(--terracotta);color:var(--terracotta);}
+.profile-card .btn{width:100%;justify-content:center;margin-top:8px;}
+
+/* ── Entry Test Section ── */
+.et-banner{background:linear-gradient(135deg,var(--terracotta-pale) 0%,var(--sage-light) 100%);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:16px 18px;margin-bottom:20px;display:flex;align-items:flex-start;gap:12px;}
+.et-banner-icon{width:36px;height:36px;background:var(--terracotta);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.et-banner-text h4{font-family:var(--font-head);font-weight:700;font-size:0.9rem;color:var(--charcoal);margin-bottom:3px;}
+.et-banner-text p{font-size:0.8rem;color:var(--charcoal-light);line-height:1.4;}
+.uni-pill{padding:10px 20px;border-radius:var(--radius-sm);border:1.5px solid var(--border);font-family:var(--font-head);font-weight:700;font-size:0.82rem;cursor:pointer;transition:all var(--transition);background:var(--cream);color:var(--charcoal-mid);display:flex;flex-direction:column;align-items:flex-start;gap:2px;}
+.uni-pill .uni-short{font-size:1rem;color:var(--charcoal);}
+.uni-pill .uni-exam{font-size:0.7rem;color:var(--charcoal-light);font-weight:500;}
+.uni-pill.selected{background:var(--terracotta);border-color:var(--terracotta);}
+.uni-pill.selected .uni-short,.uni-pill.selected .uni-exam{color:#fff;}
+.uni-pill:hover:not(.selected){border-color:var(--terracotta);background:var(--terracotta-pale);}
+.uni-pill:hover:not(.selected) .uni-short{color:var(--terracotta);}
+
+/* ════════════════════════════════
+   PAGE 3 — EXAM SESSION
+════════════════════════════════ */
+#page-exam{min-height:100vh;background:var(--cream);position:relative;overflow:hidden;}
+
+.exam-shapes-bg{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.exam-shape{position:absolute;border-radius:50%;opacity:0.1;animation:kenburns-bottom 12s ease-out infinite alternate;}
+.exam-shape-1{width:380px;height:380px;background:var(--terracotta);top:-50px;right:-100px;animation-delay:0s;}
+.exam-shape-2{width:480px;height:480px;background:var(--sage);bottom:-150px;left:-100px;animation-delay:-4s;}
+.exam-shape-3{width:280px;height:280px;background:var(--sand-dark);top:40%;left:50%;margin-left:-140px;margin-top:-140px;animation-delay:-8s;}
+
+.exam-topbar{position:sticky;top:0;z-index:100;background:rgba(253,250,246,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px;}
+.exam-topbar-inner{max-width:820px;margin:0 auto;height:64px;display:flex;align-items:center;gap:16px;}
+.topbar-logo{font-family:var(--font-head);font-weight:800;font-size:1.1rem;color:var(--charcoal);flex-shrink:0;}
+.topbar-logo span{color:var(--terracotta);}
+.topbar-back{display:inline-flex;align-items:center;gap:5px;background:var(--sand);border:1.5px solid var(--border);border-radius:100px;padding:6px 14px;font-family:var(--font-head);font-weight:600;font-size:0.8rem;color:var(--charcoal-mid);cursor:pointer;transition:all var(--transition);flex-shrink:0;}
+.topbar-back:hover{background:var(--sand-dark);color:var(--charcoal);}
+.progress-wrap{flex:1;display:flex;flex-direction:column;gap:4px;align-items:center;}
+.progress-label{font-size:0.78rem;font-weight:600;color:var(--charcoal-light);font-family:var(--font-head);}
+.progress-bar-track{width:100%;max-width:280px;height:6px;background:var(--sand-dark);border-radius:10px;overflow:hidden;}
+.progress-bar-fill{height:100%;background:var(--terracotta);border-radius:10px;transition:width 0.55s cubic-bezier(0.4,0,0.2,1);}
+.timer{font-family:var(--font-head);font-weight:700;font-size:1rem;color:var(--charcoal-mid);flex-shrink:0;background:var(--sand);padding:6px 14px;border-radius:100px;}
+
+.exam-body{position:relative;z-index:1;max-width:820px;margin:0 auto;padding:40px 24px 120px;}
+
+.skeleton-card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:40px;margin-bottom:20px;}
+.skel-line{height:16px;border-radius:8px;background:linear-gradient(90deg,var(--sand) 25%,var(--sand-dark) 50%,var(--sand) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;margin-bottom:12px;}
+.skel-line.w80{width:80%;}
+.skel-line.w60{width:60%;}
+.skel-line.w40{width:40%;}
+@keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+.skel-opts{display:flex;flex-direction:column;gap:10px;margin-top:24px;}
+.skel-opt{height:48px;border-radius:12px;background:linear-gradient(90deg,var(--sand) 25%,var(--sand-dark) 50%,var(--sand) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite 0.2s;}
+
+.q-card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:40px;box-shadow:var(--shadow-sm);}
+.q-label{display:inline-block;background:var(--terracotta-pale);color:var(--terracotta);font-family:var(--font-head);font-weight:700;font-size:0.75rem;padding:4px 12px;border-radius:100px;margin-bottom:16px;text-transform:uppercase;letter-spacing:0.5px;}
+.q-text{font-family:var(--font-head);font-size:1.25rem;font-weight:600;line-height:1.55;color:var(--charcoal);margin-bottom:28px;}
+.mcq-options{display:flex;flex-direction:column;gap:10px;}
+.opt-btn{width:100%;text-align:left;padding:14px 20px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--cream);font-family:var(--font-body);font-size:0.95rem;cursor:pointer;transition:all var(--transition);color:var(--charcoal);display:flex;align-items:center;gap:12px;}
+.opt-btn:hover{border-color:var(--terracotta);background:var(--terracotta-pale);transform:translateX(4px);}
+.opt-btn.selected{border-color:var(--terracotta);background:var(--terracotta-pale);color:var(--terracotta);font-weight:600;animation:popSelect 0.28s ease;}
+.opt-letter{width:28px;height:28px;border-radius:8px;background:var(--sand);display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:700;font-size:0.8rem;flex-shrink:0;transition:background var(--transition),color var(--transition);}
+.opt-btn.selected .opt-letter{background:var(--terracotta);color:#fff;}
+textarea.answer-area{min-height:160px;resize:vertical;line-height:1.6;}
+
+.exam-footer{position:fixed;bottom:0;left:0;right:0;padding:20px 24px;background:rgba(253,250,246,0.96);backdrop-filter:blur(12px);border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.exam-footer-left{display:flex;align-items:center;gap:8px;font-size:0.82rem;color:var(--charcoal-light);font-family:var(--font-head);}
+.exam-footer .btn{padding:14px 32px;}
+
+/* ════════════════════════════════
+   PAGE 4 — RESULTS
+════════════════════════════════ */
+#page-results{min-height:100vh;padding:60px 24px 80px;}
+.results-inner{max-width:820px;margin:0 auto;}
+.results-header{text-align:center;margin-bottom:48px;}
+.results-header h2{font-family:var(--font-head);font-weight:800;font-size:2rem;color:var(--charcoal);margin-top:24px;margin-bottom:8px;}
+.results-header p{color:var(--charcoal-light);}
+
+.score-ring-wrap{display:flex;justify-content:center;margin-bottom:8px;}
+.score-ring-svg{transform:rotate(-90deg);}
+.score-ring-bg{fill:none;stroke:var(--sand-dark);stroke-width:10;}
+.score-ring-fill{fill:none;stroke:var(--terracotta);stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset 1.4s cubic-bezier(0.4,0,0.2,1);}
+.score-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;}
+.score-pct{font-family:var(--font-head);font-weight:800;font-size:2.2rem;color:var(--charcoal);}
+.score-sub{font-size:0.78rem;color:var(--charcoal-light);font-weight:500;}
+.score-ring-container{position:relative;width:140px;height:140px;}
+
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:48px;}
+.metric-card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius-md);padding:24px 20px;text-align:center;opacity:0;}
+.metric-card.anim{animation:fadeSlideUp 0.5s ease forwards;}
+.metric-card.anim:nth-child(1){animation-delay:0.05s;}
+.metric-card.anim:nth-child(2){animation-delay:0.15s;}
+.metric-card.anim:nth-child(3){animation-delay:0.25s;}
+.metric-num{font-family:var(--font-head);font-weight:800;font-size:2rem;margin-bottom:4px;}
+.metric-label{font-size:0.82rem;color:var(--charcoal-light);font-weight:500;}
+.metric-card.correct .metric-num{color:var(--sage);}
+.metric-card.wrong .metric-num{color:var(--terracotta);}
+.metric-card.skipped .metric-num{color:var(--charcoal-light);}
+
+.review-section h3{font-family:var(--font-head);font-weight:700;font-size:1.2rem;margin-bottom:20px;color:var(--charcoal);}
+.review-item{border:1px solid var(--border);border-radius:var(--radius-md);padding:24px;margin-bottom:16px;background:var(--card-bg);}
+.review-item.correct{border-left:4px solid var(--sage);}
+.review-item.wrong{border-left:4px solid var(--terracotta);}
+.review-item.skipped{border-left:4px solid var(--sand-dark);}
+.review-q{font-family:var(--font-head);font-weight:600;color:var(--charcoal);margin-bottom:14px;line-height:1.45;}
+.review-answers{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;}
+.ans-row{display:flex;align-items:flex-start;gap:10px;font-size:0.88rem;}
+.ans-badge{flex-shrink:0;padding:3px 10px;border-radius:100px;font-weight:700;font-size:0.72rem;font-family:var(--font-head);}
+.ans-badge.yours{background:rgba(232,114,74,0.12);color:var(--terracotta);}
+.ans-badge.correct-lbl{background:rgba(123,174,138,0.15);color:var(--sage);}
+.review-exp{font-size:0.88rem;color:var(--charcoal-mid);line-height:1.6;background:var(--sand);border-radius:10px;padding:12px 14px;margin-top:4px;}
+
+.results-back-bar{display:flex;justify-content:flex-start;margin-bottom:32px;}
+.results-actions{display:flex;gap:14px;justify-content:center;margin-top:40px;flex-wrap:wrap;}
+
+/* ── MODALS ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(44,36,22,0.45);z-index:999;display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal-box{background:var(--card-bg);border-radius:var(--radius-lg);padding:44px 40px;max-width:560px;width:100%;box-shadow:var(--shadow-lg);position:relative;}
+.modal-close{position:absolute;top:16px;right:16px;width:32px;height:32px;border:none;background:var(--sand);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:var(--charcoal-mid);}
+.modal-close:hover{background:var(--sand-dark);}
+.modal-box h3{font-family:var(--font-head);font-weight:800;font-size:1.4rem;margin-bottom:6px;color:var(--charcoal);}
+.modal-box p{color:var(--charcoal-light);margin-bottom:24px;font-size:0.9rem;}
+.share-summary{background:var(--cream);border:1px solid var(--border);border-radius:var(--radius-sm);padding:20px;margin-bottom:24px;}
+.share-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:0.9rem;}
+.share-row:last-child{border:none;}
+.share-row span:first-child{color:var(--charcoal-light);}
+.share-row span:last-child{font-weight:600;color:var(--charcoal);}
+.modal-box .btn{width:100%;justify-content:center;}
+
+/* Exit modal specific */
+#exit-modal .modal-box{max-width:420px;text-align:center;padding:44px 32px;}
+#exit-modal .modal-box h3{font-size:1.3rem;}
+.exit-modal-icon{width:56px;height:56px;background:var(--terracotta-pale);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
+.exit-modal-actions{display:flex;gap:12px;margin-top:24px;}
+.exit-modal-actions .btn{flex:1;justify-content:center;padding:12px 16px;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--charcoal);color:#fff;border-radius:12px;padding:12px 22px;font-size:0.9rem;opacity:0;transition:all 0.35s ease;z-index:1000;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+@media(max-width:640px){
+  .hero h1{font-size:1.8rem;letter-spacing:-0.5px;}
+  .hero p{font-size:1rem;}
+  .hero{padding:40px 0;}
+  .hero-inner{padding:0 4px;}
+  .container{padding:0 20px;}
+  .features{padding:40px 0 60px;}
+  .feature-card{padding:24px 20px;}
+  .profile-card{padding:28px 20px;}
+  .q-card{padding:24px 20px;}
+  .q-text{font-size:1.05rem;}
+  .metrics{grid-template-columns:1fr;gap:10px;}
+  .results-actions{flex-direction:column;}
+  .topbar-logo{display:none;}
+  .modal-box{padding:28px 20px;}
+  .uni-pill{padding:8px 14px;}
+  .btn-cta{width:100%;justify-content:center;}
+  nav .container{padding:0 20px;}
+}
+
+/* ════════════════════════════════
+   MCQ COUNT SELECTOR
+════════════════════════════════ */
+.count-group-label{
+  display:flex;align-items:center;gap:8px;
+  font-family:var(--font-head);font-weight:600;font-size:0.85rem;
+  color:var(--charcoal-mid);margin-bottom:10px;
+}
+.count-group-label .count-mode-badge{
+  font-size:0.7rem;font-weight:700;padding:2px 8px;border-radius:100px;
+  background:var(--terracotta-pale);color:var(--terracotta);
+  text-transform:uppercase;letter-spacing:0.4px;
+}
+.count-pill-group{display:flex;gap:10px;flex-wrap:wrap;}
+.count-pill{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:1px;padding:10px 20px;min-width:72px;
+  border-radius:var(--radius-sm);border:1.5px solid var(--border);
+  background:var(--cream);cursor:pointer;
+  transition:all 0.22s cubic-bezier(0.34,1.56,0.64,1);
+  position:relative;overflow:hidden;
+}
+.count-pill::before{
+  content:'';position:absolute;inset:0;background:var(--terracotta);
+  transform:scaleY(0);transform-origin:bottom;
+  transition:transform 0.22s cubic-bezier(0.4,0,0.2,1);z-index:0;
+}
+.count-pill:hover{border-color:var(--terracotta);transform:translateY(-2px);box-shadow:0 6px 18px rgba(232,114,74,0.15);}
+.count-pill.selected{border-color:var(--terracotta);background:var(--terracotta);box-shadow:0 6px 20px rgba(232,114,74,0.35);transform:translateY(-2px);}
+.count-pill.selected::before{transform:scaleY(1);}
+.cp-num{
+  font-family:var(--font-head);font-weight:800;font-size:1.4rem;
+  color:var(--charcoal);line-height:1;position:relative;z-index:1;
+  transition:color 0.2s ease;
+}
+.cp-lbl{
+  font-family:var(--font-head);font-weight:600;font-size:0.68rem;
+  color:var(--charcoal-light);text-transform:uppercase;letter-spacing:0.5px;
+  position:relative;z-index:1;transition:color 0.2s ease;
+}
+.count-pill:hover .cp-num{color:var(--terracotta);}
+.count-pill:hover .cp-lbl{color:var(--terracotta);}
+.count-pill.selected .cp-num,.count-pill.selected .cp-lbl{color:#fff;}
+
+/* ════════════════════════════════
+   CUSTOM GRADE PICKER
+════════════════════════════════ */
+.gp-trigger{
+  width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  background:var(--cream);cursor:pointer;display:flex;align-items:center;justify-content:space-between;
+  transition:border-color var(--transition),box-shadow var(--transition),background var(--transition);
+  user-select:none;position:relative;
+}
+.gp-trigger:hover{border-color:var(--terracotta);background:#fff;}
+.gp-trigger.open{border-color:var(--terracotta);box-shadow:0 0 0 3px rgba(232,114,74,0.12);background:#fff;border-bottom-left-radius:0;border-bottom-right-radius:0;border-bottom-color:transparent;}
+.gp-trigger.has-value{border-color:var(--terracotta);}
+.gp-trigger-left{display:flex;align-items:center;gap:10px;}
+.gp-trigger-icon{width:28px;height:28px;border-radius:8px;background:var(--sand);display:flex;align-items:center;justify-content:center;color:var(--charcoal-light);flex-shrink:0;transition:background var(--transition),color var(--transition);}
+.gp-trigger.has-value .gp-trigger-icon{background:var(--terracotta-pale);color:var(--terracotta);}
+.gp-trigger-text{font-family:var(--font-body);font-size:0.95rem;color:var(--charcoal-light);}
+.gp-trigger.has-value .gp-trigger-text{color:var(--charcoal);font-weight:500;}
+.gp-chevron{color:var(--charcoal-light);transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);}
+.gp-trigger.open .gp-chevron{transform:rotate(180deg);color:var(--terracotta);}
+
+/* Panel */
+.gp-panel{
+  position:relative;z-index:200;
+  background:#fff;border:1.5px solid var(--terracotta);
+  border-top:none;border-bottom-left-radius:var(--radius-sm);border-bottom-right-radius:var(--radius-sm);
+  box-shadow:0 16px 40px rgba(44,36,22,0.14);
+  max-height:0;overflow:hidden;
+  transition:max-height 0.42s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease;
+  opacity:0;pointer-events:none;
+}
+.gp-panel.open{max-height:480px;opacity:1;pointer-events:auto;overflow-y:auto;}
+
+/* Scrollbar */
+.gp-panel::-webkit-scrollbar{width:4px;}
+.gp-panel::-webkit-scrollbar-track{background:transparent;}
+.gp-panel::-webkit-scrollbar-thumb{background:var(--sand-dark);border-radius:4px;}
+
+.gp-panel-inner{padding:16px;}
+
+/* Section header */
+.gp-section{margin-bottom:4px;}
+.gp-section-header{
+  display:flex;align-items:center;gap:6px;
+  font-family:var(--font-head);font-weight:700;font-size:0.72rem;
+  color:var(--charcoal-light);text-transform:uppercase;letter-spacing:0.8px;
+  padding:4px 2px 8px;
+}
+.gp-section-header svg{color:var(--terracotta);}
+
+/* Grid layout for school grades */
+.gp-grid{
+  display:grid;grid-template-columns:repeat(6,1fr);gap:6px;
+}
+.gp-item{
+  padding:8px 4px;text-align:center;border-radius:10px;
+  font-family:var(--font-head);font-weight:600;font-size:0.8rem;
+  color:var(--charcoal-mid);background:var(--cream);border:1.5px solid var(--border);
+  cursor:pointer;transition:all 0.18s cubic-bezier(0.34,1.56,0.64,1);
+  animation:gpItemIn 0.25s ease both;
+}
+.gp-item:hover{
+  background:var(--terracotta-pale);border-color:var(--terracotta);
+  color:var(--terracotta);transform:translateY(-2px) scale(1.06);
+  box-shadow:0 4px 12px rgba(232,114,74,0.18);
+}
+.gp-item.selected{
+  background:var(--terracotta);border-color:var(--terracotta);
+  color:#fff;transform:scale(1.04);
+  box-shadow:0 4px 14px rgba(232,114,74,0.35);
+}
+
+/* List layout for university years */
+.gp-list{display:flex;flex-direction:column;gap:4px;}
+.gp-item-list{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;text-align:left;border-radius:10px;
+  font-family:var(--font-head);font-weight:600;font-size:0.85rem;
+}
+.gp-item-list:hover{transform:translateX(4px) scale(1);}
+.gp-item-list.selected{transform:translateX(4px);}
+.gp-item-num{
+  font-size:0.72rem;font-weight:800;color:var(--charcoal-light);
+  background:var(--sand);border-radius:6px;padding:2px 6px;
+  font-variant-numeric:tabular-nums;flex-shrink:0;transition:background var(--transition),color var(--transition);
+}
+.gp-item-list.selected .gp-item-num,.gp-item-list:hover .gp-item-num{background:rgba(255,255,255,0.25);color:inherit;}
+
+/* Divider */
+.gp-divider{height:1px;background:var(--border);margin:10px 0;}
+
+/* Entry test card */
+.gp-entry-card{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 14px;border-radius:var(--radius-sm);
+  background:linear-gradient(135deg,var(--terracotta-pale) 0%,var(--sage-light) 100%);
+  border:1.5px solid rgba(232,114,74,0.2);cursor:pointer;
+  transition:all 0.22s cubic-bezier(0.34,1.56,0.64,1);
+}
+.gp-entry-card:hover{
+  transform:translateY(-2px) scale(1.01);
+  box-shadow:0 8px 24px rgba(232,114,74,0.18);
+  border-color:var(--terracotta);
+}
+.gp-entry-card.selected{
+  background:linear-gradient(135deg,var(--terracotta) 0%,var(--terracotta-light) 100%);
+  border-color:var(--terracotta);
+  box-shadow:0 8px 24px rgba(232,114,74,0.35);
+}
+.gp-entry-icon{
+  width:36px;height:36px;background:var(--terracotta);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  transition:transform var(--transition);
+}
+.gp-entry-card.selected .gp-entry-icon{background:rgba(255,255,255,0.2);}
+.gp-entry-card:hover .gp-entry-icon{transform:scale(1.1) rotate(-5deg);}
+.gp-entry-text{flex:1;display:flex;flex-direction:column;gap:2px;}
+.gp-entry-title{
+  font-family:var(--font-head);font-weight:700;font-size:0.88rem;color:var(--charcoal);
+  transition:color var(--transition);
+}
+.gp-entry-card.selected .gp-entry-title{color:#fff;}
+.gp-entry-sub{
+  font-size:0.72rem;color:var(--charcoal-light);font-weight:500;
+  transition:color var(--transition);
+}
+.gp-entry-card.selected .gp-entry-sub{color:rgba(255,255,255,0.75);}
+.gp-entry-arrow{color:var(--charcoal-light);flex-shrink:0;transition:transform var(--transition),color var(--transition);}
+.gp-entry-card:hover .gp-entry-arrow{transform:translateX(2px);color:var(--terracotta);}
+.gp-entry-card.selected .gp-entry-arrow{color:#fff;transform:translateX(3px);}
+
+/* Item stagger animation */
+@keyframes gpItemIn{
+  from{opacity:0;transform:translateY(6px) scale(0.92);}
+  to{opacity:1;transform:translateY(0) scale(1);}
+}
+
+@media print{
+  body *:not(#share-print-area):not(#share-print-area *){display:none!important;}
+  #share-print-area{display:block!important;}
+}
+
+/* ── Auth button disabled state ── */
+.btn:disabled{opacity:0.65;cursor:not-allowed;transform:none!important;box-shadow:none!important;}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════
+     PAGE: LOGIN
+══════════════════════════════════ -->
+<div id="page-login" class="page">
+  <div class="profile-bg-layers">
+    <div class="profile-watermark">XectraAI</div>
+    <div class="p-shape p-shape-1"></div>
+    <div class="p-shape p-shape-2"></div>
+    <div class="p-shape p-shape-3"></div>
+    <div class="p-shape p-shape-4"></div>
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px;position:relative;z-index:1;">
+    <div class="nav-logo" style="margin-bottom:32px;">Xectra<span style="color:var(--terracotta);">AI</span></div>
+    <div class="profile-card" style="animation:bounce-in-top 1s both;">
+      <h2>Welcome Back</h2>
+      <p class="sub">Log in to resume your exam prep journey.</p>
+      <div class="form-group">
+        <label for="login-email">Email</label>
+        <input type="text" id="login-email" placeholder="your@email.com"/>
+      </div>
+      <div class="form-group" style="position:relative;">
+        <label for="login-pass">Password</label>
+        <input type="password" id="login-pass" placeholder="Enter password" style="width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:0.95rem;color:var(--charcoal);background:var(--cream);outline:none;"/>
+        <span onclick="togglePassword('login-pass', this)" style="position:absolute;right:16px;top:38px;font-size:0.75rem;font-weight:700;color:var(--charcoal-light);cursor:pointer;text-transform:uppercase;font-family:var(--font-head);">Show</span>
+      </div>
+      <!-- FIX: Added id="login-btn" so setAuthLoading can target this button -->
+      <button id="login-btn" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:12px;" onclick="handleLogin()">Log In &rarr;</button>
+      <button id="google-btn" onclick="loginWithGoogle()" class="btn btn-outline" style="width:100%;justify-content:center;margin-top:10px;">
+        Continue with Google
+      </button>
+      <div style="text-align:center;margin-top:24px;font-size:0.9rem;color:var(--charcoal-mid);">
+        Don't have an account? <span style="color:var(--terracotta);font-weight:600;cursor:pointer;" onclick="showPage('signup')">Sign up</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     PAGE: SIGNUP
+══════════════════════════════════ -->
+<div id="page-signup" class="page">
+  <div class="profile-bg-layers">
+    <div class="profile-watermark">XectraAI</div>
+    <div class="p-shape p-shape-1"></div>
+    <div class="p-shape p-shape-2"></div>
+    <div class="p-shape p-shape-3"></div>
+    <div class="p-shape p-shape-4"></div>
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px;position:relative;z-index:1;">
+    <div style="width:100%;max-width:480px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;">
+      <button class="back-btn" onclick="showPage('login')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Back to Login
+      </button>
+      <div class="nav-logo">Xectra<span style="color:var(--terracotta);">AI</span></div>
+    </div>
+    <div class="profile-card" style="animation:bounce-in-top 1s both;">
+      <h2>Create Account</h2>
+      <p class="sub">Set up your profile to start generating custom exams.</p>
+      <div class="form-group">
+        <label for="reg-name">Full Name</label>
+        <input type="text" id="reg-name" placeholder="e.g. Aanya Sharma"/>
+      </div>
+      <div class="form-group">
+        <label for="reg-email">Email</label>
+        <input type="text" id="reg-email" placeholder="your@email.com"/>
+      </div>
+      <div class="form-group" style="position:relative;">
+        <label for="reg-pass">Password</label>
+        <input type="password" id="reg-pass" placeholder="Create a password" style="width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:0.95rem;color:var(--charcoal);background:var(--cream);outline:none;"/>
+        <span onclick="togglePassword('reg-pass', this)" style="position:absolute;right:16px;top:38px;font-size:0.75rem;font-weight:700;color:var(--charcoal-light);cursor:pointer;text-transform:uppercase;font-family:var(--font-head);">Show</span>
+      </div>
+      <div class="form-group" style="position:relative;">
+        <label for="reg-confirm">Confirm Password</label>
+        <input type="password" id="reg-confirm" placeholder="Repeat password" style="width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:0.95rem;color:var(--charcoal);background:var(--cream);outline:none;"/>
+        <span onclick="togglePassword('reg-confirm', this)" style="position:absolute;right:16px;top:38px;font-size:0.75rem;font-weight:700;color:var(--charcoal-light);cursor:pointer;text-transform:uppercase;font-family:var(--font-head);">Show</span>
+      </div>
+      <button id="signup-btn" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:12px;" onclick="handleSignup()">Sign Up &rarr;</button>
+      <div style="text-align:center;margin-top:24px;font-size:0.9rem;color:var(--charcoal-mid);">
+        Already have an account? <span style="color:var(--terracotta);font-weight:600;cursor:pointer;" onclick="showPage('login')">Log in</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     PAGE 1: LANDING
+══════════════════════════════════ -->
+<div id="page-landing" class="page">
+  <div class="shapes-bg">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+    <div class="shape shape-4"></div>
+    <div class="shape shape-5"></div>
+  </div>
+
+  <nav>
+    <div class="container" style="display:flex;align-items:center;justify-content:space-between;">
+      <div class="nav-logo">Xectra<span>AI</span></div>
+      <div id="nav-user" style="display:none;align-items:center;gap:16px;">
+        <span id="nav-greeting" style="font-family:var(--font-head);font-weight:600;color:var(--charcoal-mid);font-size:0.95rem;"></span>
+        <button class="btn btn-outline" style="padding:6px 14px;font-size:0.85rem;" onclick="logout()">Log out</button>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero container">
+    <div class="hero-inner">
+      <div class="hero-tag">AI-Powered Exam Prep</div>
+      <h1>Know exactly how <em>ready</em> you are.</h1>
+      <p>XectraAI builds a personalised exam from your syllabus, and tells you exactly what to fix, so you walk into the exam hall with real confidence.</p>
+      <button class="btn btn-primary btn-cta" onclick="showPage('profile')">Start your prep &rarr;</button>
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="container">
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feat-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E8724A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          </div>
+          <h3>Adaptive Questions</h3>
+          <p>Questions shaped to your exact class, subject, and chapter — not a generic question bank. Every session feels like it was made just for you.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feat-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7BAE8A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <h3>Instant Feedback</h3>
+          <p>After each exam, get a clear breakdown of what you got right, wrong, and skipped — with a plain-English explanation for every answer.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feat-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E8724A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+          </div>
+          <h3>Share Your Results</h3>
+          <p>Generate a clean, shareable report of your performance. Print it, send it to a teacher, or keep it for your own revision records.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ══════════════════════════════════
+     PAGE 2: PROFILE SETUP
+══════════════════════════════════ -->
+<div id="page-profile" class="page">
+  <div class="profile-bg-layers">
+    <div class="profile-watermark">XectraAI</div>
+    <div class="p-shape p-shape-1"></div>
+    <div class="p-shape p-shape-2"></div>
+    <div class="p-shape p-shape-3"></div>
+    <div class="p-shape p-shape-4"></div>
+  </div>
+
+  <nav style="position:relative;z-index:10;padding:24px 0;">
+    <div class="container" style="display:flex;align-items:center;justify-content:space-between;">
+      <button class="back-btn" onclick="showPage('landing')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Back
+      </button>
+      <div class="nav-logo" style="cursor:pointer;" onclick="showPage('landing')">Xectra<span style="color:var(--terracotta);">AI</span></div>
+    </div>
+  </nav>
+
+  <div id="profile-page-body" style="display:flex;flex-direction:column;align-items:center;padding:20px 20px 80px;position:relative;z-index:1;">
+    <div class="step-bar">
+      <div class="step-item">
+        <div class="step-dot active" id="dot1">1</div>
+        <div class="step-label">Your Profile</div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-item">
+        <div class="step-dot pending" id="dot2">2</div>
+        <div class="step-label">Exam Setup</div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-item">
+        <div class="step-dot pending" id="dot3">3</div>
+        <div class="step-label">Results</div>
+      </div>
+    </div>
+
+    <div class="profile-card">
+      <h2>Set up your profile</h2>
+      <p class="sub">Tell us who you are and what you're studying. We'll build an exam that fits you precisely.</p>
+
+      <div class="form-group">
+        <label for="inp-name">Your Name</label>
+        <input type="text" id="inp-name" placeholder="e.g. Aanya Sharma"/>
+      </div>
+
+      <div class="form-group">
+        <label>Class / Grade / Entry Test</label>
+        <input type="hidden" id="inp-grade"/>
+        <div class="gp-trigger" id="gp-trigger" onclick="toggleGradePicker()">
+          <div class="gp-trigger-left">
+            <div class="gp-trigger-icon" id="gp-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+            </div>
+            <span class="gp-trigger-text" id="gp-trigger-text">Select your grade</span>
+          </div>
+          <svg class="gp-chevron" id="gp-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+
+        <div class="gp-panel" id="gp-panel">
+          <div class="gp-panel-inner">
+            <div class="gp-section">
+              <div class="gp-section-header">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                School
+              </div>
+              <div class="gp-grid">
+                <div class="gp-item" data-value="Grade 1" onclick="selectGrade(this)">Gr 1</div>
+                <div class="gp-item" data-value="Grade 2" onclick="selectGrade(this)">Gr 2</div>
+                <div class="gp-item" data-value="Grade 3" onclick="selectGrade(this)">Gr 3</div>
+                <div class="gp-item" data-value="Grade 4" onclick="selectGrade(this)">Gr 4</div>
+                <div class="gp-item" data-value="Grade 5" onclick="selectGrade(this)">Gr 5</div>
+                <div class="gp-item" data-value="Grade 6" onclick="selectGrade(this)">Gr 6</div>
+                <div class="gp-item" data-value="Grade 7" onclick="selectGrade(this)">Gr 7</div>
+                <div class="gp-item" data-value="Grade 8" onclick="selectGrade(this)">Gr 8</div>
+                <div class="gp-item" data-value="Grade 9" onclick="selectGrade(this)">Gr 9</div>
+                <div class="gp-item" data-value="Grade 10" onclick="selectGrade(this)">Gr 10</div>
+                <div class="gp-item" data-value="Grade 11" onclick="selectGrade(this)">Gr 11</div>
+                <div class="gp-item" data-value="Grade 12" onclick="selectGrade(this)">Gr 12</div>
+              </div>
+            </div>
+            <div class="gp-divider"></div>
+            <div class="gp-section">
+              <div class="gp-section-header">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                University
+              </div>
+              <div class="gp-list">
+                <div class="gp-item gp-item-list" data-value="College — Year 1" onclick="selectGrade(this)"><span class="gp-item-num">01</span>First Year</div>
+                <div class="gp-item gp-item-list" data-value="College — Year 2" onclick="selectGrade(this)"><span class="gp-item-num">02</span>Second Year</div>
+                <div class="gp-item gp-item-list" data-value="College — Year 3" onclick="selectGrade(this)"><span class="gp-item-num">03</span>Third Year</div>
+                <div class="gp-item gp-item-list" data-value="College — Year 4" onclick="selectGrade(this)"><span class="gp-item-num">04</span>Fourth Year</div>
+              </div>
+            </div>
+            <div class="gp-divider"></div>
+            <div class="gp-section">
+              <div class="gp-entry-card" data-value="entry-test" onclick="selectGrade(this)">
+                <div class="gp-entry-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                </div>
+                <div class="gp-entry-text">
+                  <span class="gp-entry-title">Entry Test Preparation</span>
+                  <span class="gp-entry-sub">FAST · NUST · GIKI · COMSATS</span>
+                </div>
+                <svg class="gp-entry-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ENTRY TEST SECTION ── -->
+      <div id="entry-test-section" style="display:none;">
+        <div class="et-banner">
+          <div class="et-banner-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+          </div>
+          <div class="et-banner-text">
+            <h4>Entry Test Mode</h4>
+            <p>Questions are calibrated to match the actual difficulty and pattern of Pakistani university entry tests.</p>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Select University</label>
+          <div class="pill-group" id="uni-pills">
+            <div class="uni-pill" data-uni="FAST" onclick="selectUniversity(this)">
+              <span class="uni-short">FAST</span>
+              <span class="uni-exam">FAST NU Test</span>
+            </div>
+            <div class="uni-pill" data-uni="NUST" onclick="selectUniversity(this)">
+              <span class="uni-short">NUST</span>
+              <span class="uni-exam">NET</span>
+            </div>
+            <div class="uni-pill" data-uni="GIKI" onclick="selectUniversity(this)">
+              <span class="uni-short">GIKI</span>
+              <span class="uni-exam">Entry Test</span>
+            </div>
+            <div class="uni-pill" data-uni="COMSATS" onclick="selectUniversity(this)">
+              <span class="uni-short">COMSATS</span>
+              <span class="uni-exam">Entry Test</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group" id="et-subject-group" style="display:none;">
+          <label>Select Subject</label>
+          <div class="pill-group" id="et-subject-pills"></div>
+        </div>
+
+        <div class="form-group" id="et-count-group" style="display:none;">
+          <div class="count-group-label">
+            Number of MCQs
+            <span class="count-mode-badge">Entry Test</span>
+          </div>
+          <div class="count-pill-group" id="et-count-pills">
+            <div class="count-pill selected" data-count="10" onclick="selectMCQCount(this,'et')">
+              <span class="cp-num">10</span><span class="cp-lbl">MCQs</span>
+            </div>
+            <div class="count-pill" data-count="20" onclick="selectMCQCount(this,'et')">
+              <span class="cp-num">20</span><span class="cp-lbl">MCQs</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── REGULAR SUBJECT / CHAPTER ── -->
+      <div id="regular-fields">
+        <div class="form-group">
+          <label for="inp-subject">Subject</label>
+          <input type="text" id="inp-subject" placeholder="e.g. Physics, World History, Python"/>
+        </div>
+        <div class="form-group">
+          <label for="inp-chapter">Chapter or Topic</label>
+          <input type="text" id="inp-chapter" placeholder="e.g. Chapter 5: Kinematics, or The French Revolution"/>
+        </div>
+      </div>
+
+      <div class="form-group" id="qtype-group">
+        <label>Question Type Preference</label>
+        <div class="pill-group" id="type-pills">
+          <div class="pill selected" data-type="mixed">Mixed</div>
+          <div class="pill" data-type="mcq">MCQ</div>
+          <div class="pill" data-type="written">Written</div>
+          <div class="pill" data-type="logic">Coding Logic</div>
+        </div>
+      </div>
+
+      <div class="form-group" id="normal-count-group">
+        <div class="count-group-label">
+          Number of Questions
+          <span class="count-mode-badge" style="background:var(--sage-light);color:var(--sage);">Normal Test</span>
+        </div>
+        <div class="count-pill-group" id="normal-count-pills">
+          <div class="count-pill selected" data-count="10" onclick="selectMCQCount(this,'normal')">
+            <span class="cp-num">10</span><span class="cp-lbl">Qs</span>
+          </div>
+          <div class="count-pill" data-count="15" onclick="selectMCQCount(this,'normal')">
+            <span class="cp-num">15</span><span class="cp-lbl">Qs</span>
+          </div>
+          <div class="count-pill" data-count="20" onclick="selectMCQCount(this,'normal')">
+            <span class="cp-num">20</span><span class="cp-lbl">Qs</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="startExam()">Build my exam &rarr;</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     PAGE 3: EXAM SESSION
+══════════════════════════════════ -->
+<div id="page-exam" class="page">
+  <div class="exam-shapes-bg">
+    <div class="exam-shape exam-shape-1"></div>
+    <div class="exam-shape exam-shape-2"></div>
+    <div class="exam-shape exam-shape-3"></div>
+  </div>
+
+  <div class="exam-topbar">
+    <div class="exam-topbar-inner">
+      <button class="topbar-back" onclick="openExitModal()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Exit
+      </button>
+      <div class="topbar-logo">Xectra<span>AI</span></div>
+      <div class="progress-wrap">
+        <div class="progress-label" id="prog-label">Question 1 of 8</div>
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill" id="prog-fill" style="width:12.5%"></div>
+        </div>
+      </div>
+      <div class="timer" id="timer-display">0:00</div>
+    </div>
+  </div>
+
+  <div class="exam-body" id="exam-body"></div>
+
+  <div class="exam-footer">
+    <div class="exam-footer-left">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span id="footer-hint">Select an answer or skip to continue</span>
+    </div>
+    <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()">Next &rarr;</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     PAGE 4: RESULTS
+══════════════════════════════════ -->
+<div id="page-results" class="page">
+  <div class="results-inner">
+    <div class="results-back-bar">
+      <button class="back-btn" onclick="tryAgain()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        New Exam
+      </button>
+    </div>
+
+    <div class="results-header">
+      <div class="score-ring-wrap">
+        <div class="score-ring-container">
+          <svg class="score-ring-svg" width="140" height="140" viewBox="0 0 140 140">
+            <circle class="score-ring-bg" cx="70" cy="70" r="58"/>
+            <circle class="score-ring-fill" id="score-circle" cx="70" cy="70" r="58" stroke-dasharray="364" stroke-dashoffset="364"/>
+          </svg>
+          <div class="score-center">
+            <div class="score-pct" id="score-pct">0%</div>
+            <div class="score-sub">Score</div>
+          </div>
+        </div>
+      </div>
+      <h2 id="results-title">Here's how you did.</h2>
+      <p id="results-sub">Review each answer below to understand where to focus next.</p>
+    </div>
+
+    <div class="metrics">
+      <div class="metric-card correct"><div class="metric-num" id="m-correct">0</div><div class="metric-label">Correct</div></div>
+      <div class="metric-card wrong"><div class="metric-num" id="m-wrong">0</div><div class="metric-label">Incorrect</div></div>
+      <div class="metric-card skipped"><div class="metric-num" id="m-skipped">0</div><div class="metric-label">Skipped</div></div>
+    </div>
+
+    <div class="review-section">
+      <h3>Question-by-question review</h3>
+      <div id="review-list"></div>
+    </div>
+
+    <div class="results-actions">
+      <button class="btn btn-outline" onclick="tryAgain()">Try again</button>
+      <button class="btn btn-primary" onclick="openShareModal()">Share report &rarr;</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── SHARE MODAL ── -->
+<div class="modal-overlay" id="share-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeShareModal()">&#10005;</button>
+    <h3>Your XectraAI Report</h3>
+    <p>A summary of your exam session. You can print this or save it as a PDF.</p>
+    <div class="share-summary" id="share-print-area">
+      <div class="share-row"><span>Student</span><span id="sh-name">—</span></div>
+      <div class="share-row"><span>Grade</span><span id="sh-grade">—</span></div>
+      <div class="share-row"><span>Subject</span><span id="sh-subject">—</span></div>
+      <div class="share-row"><span>Topic</span><span id="sh-chapter">—</span></div>
+      <div class="share-row"><span>Score</span><span id="sh-score">—</span></div>
+      <div class="share-row"><span>Correct</span><span id="sh-correct">—</span></div>
+      <div class="share-row"><span>Incorrect</span><span id="sh-wrong">—</span></div>
+      <div class="share-row"><span>Skipped</span><span id="sh-skipped">—</span></div>
+    </div>
+    <button class="btn btn-primary" onclick="window.print()">Print / Save as PDF</button>
+  </div>
+</div>
+
+<!-- ── EXIT EXAM CONFIRMATION MODAL ── -->
+<div class="modal-overlay" id="exit-modal">
+  <div class="modal-box">
+    <div class="exit-modal-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#E8724A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    </div>
+    <h3>Exit this exam?</h3>
+    <p>Your current progress and all answers will be lost. You'll be taken back to the setup screen.</p>
+    <div class="exit-modal-actions">
+      <button class="btn btn-outline" onclick="closeExitModal()">Keep going</button>
+      <button class="btn btn-primary" onclick="confirmExitExam()">Yes, exit</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOAST ── -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════
+// SUPABASE INIT
+// ════════════════════════════════
+const { createClient } = supabase;
+const supabaseClient = createClient(
+  'https://hkzuuvccjrpgnbpuubzk.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhrenV1dmNjanJwZ25icHV1YnprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3MzE0NjUsImV4cCI6MjA4OTMwNzQ2NX0.lxqcgcl7HOXEmKbFXCj82lZDt3xHLthjpuQYgDDwCEY'
+);
+
+// ════════════════════════════════
+// STATE
+// ════════════════════════════════
+let state = {
+  name:'', grade:'', subject:'', chapter:'', qType:'mixed',
+  mcqCount: 10,
+  entryTestMode: false, entryTestUniversity: '', entryTestSubject: '',
+  questions:[], answers:[], currentQ:0, timerSecs:0, timerInterval:null
+};
+
+// ── FIX: In-memory question cache to avoid redundant API calls ──
+// Key: JSON string of {grade, subject, chapter, qType, mcqCount, uni, uniSubj}
+// Value: question array
+const _questionCache = new Map();
+
+function _cacheKey() {
+  return JSON.stringify({
+    grade: state.grade,
+    subject: state.subject,
+    chapter: state.chapter,
+    qType: state.entryTestMode ? 'mcq' : state.qType,
+    n: state.mcqCount,
+    uni: state.entryTestUniversity,
+    uniSubj: state.entryTestSubject
+  });
+}
+
+// ── FIX: Auth guard — prevent double-submission during async auth ops ──
+let _authInFlight = false;
+
+// ── Entry test data ──
+const UNI_SUBJECTS = {
+  'FAST':    ['Mathematics', 'Physics', 'English', 'IQ / Verbal Reasoning'],
+  'NUST':    ['Mathematics', 'Physics', 'Chemistry', 'Biology', 'English'],
+  'GIKI':    ['Mathematics', 'Physics', 'English'],
+  'COMSATS': ['Mathematics', 'Physics', 'Chemistry', 'English']
+};
+
+const UNI_SUBJECT_MAP = {
+  'FAST': {
+    testName: 'FAST NU Admission Test',
+    testDesc: 'The FAST NU admission test is moderately difficult, time-pressured, and tests analytical ability. It emphasises conceptual understanding combined with calculation speed.',
+    subjects: {
+      'Mathematics': {
+        topics: [
+          'Algebra: linear/quadratic equations, simultaneous equations, inequalities, logarithms, surds, partial fractions',
+        'Trigonometry: standard angle values, identities (Pythagorean, double-angle), equations, inverse trig',
+        'Calculus: limits, derivatives (chain/product/quotient rule), integration (antiderivatives, definite integrals)',
+        'Permutations & Combinations: nPr, nCr, arrangement and selection problems',
+        'Probability: basic probability, conditional probability, mutually exclusive/independent events',
+        'Analytic Geometry: straight lines, circles, distance/section/midpoint formula',
+        'Matrices & Determinants: operations, inverse, Cramer\'s rule, solving 2x2/3x3 systems',
+        'Sequences & Series: AP, GP, sum formulas, infinite GP'
+        ],
+        style: 'Very hard Numerical problem-solving. Each question requires multi-step calculation. Difficulty is moderate to hard — avoid trivially simple questions. Include exact numerical values in questions. Show full working in the explanation.',
+        distractors: 'off-by-one errors, wrong formula application, sign mistakes, incorrect formula recall'
+      },
+      'Physics': {
+        topics: [
+          'Kinematics: equations of motion, projectile motion, relative velocity',
+          'Dynamics: Newton\'s laws, friction, circular motion, momentum, impulse',
+          'Work, Energy & Power: KE/PE, conservation of energy, power calculations',
+          'Waves & Sound: wave properties, Doppler effect, resonance',
+          'Thermodynamics: gas laws, heat transfer, specific heat capacity',
+          'Electricity: Ohm\'s law, Kirchhoff\'s laws, capacitors, resistor networks',
+          'Magnetism: magnetic force, electromagnetic induction, Faraday\'s law',
+          'Optics: reflection, refraction, lenses, mirrors, total internal reflection',
+          'Modern Physics: photoelectric effect, de Broglie wavelength, nuclear reactions'
+        ],
+        style: 'Mix of conceptual MCQs and numerical problems. Include physical quantities with units. Moderate to hard difficulty. Show formula and substitution in explanations.',
+        distractors: 'wrong formula selection, unit conversion errors, sign errors, misidentifying direction'
+      },
+      'English': {
+        topics: [
+          'Vocabulary: synonyms, antonyms, contextual word meaning',
+          'Grammar: tenses (all 12), subject-verb agreement, articles (a/an/the), prepositions, conjunctions',
+          'Sentence Correction: identify grammatical errors in given sentences',
+          'Fill in the Blank: choose the grammatically correct or contextually appropriate word',
+          'Analogies: word relationship pairs (e.g., hot:cold :: bright:?)',
+          'One Word Substitution: find the single word for a given phrase or definition'
+        ],
+        style: 'Pure English language questions only. No science, no math. Test vocabulary depth and grammar precision. Include options that are close enough to challenge careful reading.',
+        distractors: 'near-synonyms that differ subtly in meaning, grammatically correct but contextually wrong options'
+      },
+      'IQ / Verbal Reasoning': {
+        topics: [
+          'Number Series: identify the pattern and find the next/missing number',
+          'Letter Series: alphabetical patterns, skip patterns',
+          'Analogies: logical relationships between pairs',
+          'Odd One Out: identify which item does not belong to the group',
+          'Logical Deduction: if-then reasoning, syllogisms',
+          'Pattern Completion: visual or numerical pattern recognition',
+          'Mathematical Reasoning: basic logical math puzzles without requiring advanced formulas'
+        ],
+        style: 'Pure IQ / reasoning questions. No subject-specific knowledge required. Questions must be solvable by logic alone. Do not use Chemistry, Physics, or English grammar as content.',
+        distractors: 'numbers/letters that fit a superficially similar but wrong pattern'
+      }
+    }
+  },
+  'NUST': {
+    testName: 'NUST Entry Test (NET)',
+    testDesc: 'The NUST NET is one of Pakistan\'s most competitive engineering/medical entry tests. It is known for high difficulty, deep conceptual questions, and application-based numerical problems. Random marking (negative marking) applies. Questions require strong fundamentals.',
+    subjects: {
+      'Mathematics': {
+        topics: [
+          'Algebra: quadratic formula, remainder theorem, factor theorem, partial fractions, complex numbers',
+          'Calculus: limits (L\'Hôpital\'s rule), differentiation (implicit, parametric, higher order), integration (by parts, by substitution, definite/indefinite), differential equations (first order)',
+          'Permutations & Combinations: circular permutations, repeated items, restricted arrangements, nCr identities',
+          'Probability: Bayes\' theorem, binomial distribution, expected value',
+          'Trigonometry: compound angle formulas, double angle, half angle, inverse trig, proving identities',
+          'Vectors: dot product, cross product, vector equations, 3D geometry',
+          'Matrices: Cramer\'s rule, eigenvalues (conceptual), matrix inverse',
+          'Sequences & Series: telescoping series, infinite GP, sigma notation',
+          'Analytic Geometry: conic sections (parabola, ellipse, hyperbola), tangent lines to curves'
+        ],
+        style: 'Very Hard, multi-step numerical problems. Every question requires applying at least 2 concepts. No trivially simple arithmetic. Test-level difficulty — these should challenge FSc Part 2 toppers. Show complete worked solution in explanation.',
+        distractors: 'results from applying the wrong theorem, missing a negative sign in calculus, wrong factorial in combinatorics, confusing similar identities'
+      },
+      'Physics': {
+        topics: [
+          'Mechanics: projectile motion with angle, rotational motion, moment of inertia, torque, angular momentum',
+          'Oscillations: SHM equations, period of pendulum, spring-mass system, energy in SHM',
+          'Waves: standing waves, superposition, interference, diffraction',
+          'Thermodynamics: laws of thermodynamics, Carnot engine efficiency, entropy concepts',
+          'Electrostatics: Coulomb\'s law, electric field, Gauss\'s law, potential, capacitance',
+          'Current Electricity: Ohm\'s law, Wheatstone bridge, potentiometer, EMF, internal resistance',
+          'Electromagnetism: Ampere\'s law, magnetic flux, Faraday\'s law, Lenz\'s law, AC circuits',
+          'Optics: thin lens formula, mirror formula, magnification, interference (Young\'s slits)',
+          'Modern Physics: photoelectric effect (Einstein\'s equation), de Broglie relation, Bohr model, nuclear binding energy, radioactive decay'
+        ],
+        style: 'Challenging conceptual and numerical problems. Include multi-part reasoning. Require formula recall and application. Show full derivation or calculation in explanation.',
+        distractors: 'using wrong equation variant, incorrect sign convention, wrong unit, mixing up scalar and vector quantities'
+      },
+      'Chemistry': {
+        topics: [
+          'Atomic Structure: quantum numbers, electron configuration, periodic trends (ionisation energy, atomic radius, electronegativity)',
+          'Chemical Bonding: ionic, covalent, coordinate, metallic bonding, VSEPR theory, molecular geometry, hybridisation (sp, sp2, sp3)',
+          'Stoichiometry: mole concept, empirical/molecular formula, limiting reagent, % yield, solution concentration (molarity, molality)',
+          'Thermochemistry: Hess\'s law, enthalpy of formation/combustion, bond energies',
+          'Chemical Equilibrium: Le Chatelier\'s principle, Kc, Kp, Kw, Ka, Kb, pH calculations',
+          'Electrochemistry: standard electrode potentials, galvanic cells, electrolysis, Faraday\'s laws',
+          'Organic Chemistry: functional groups, IUPAC naming, substitution/addition/elimination reactions, benzene chemistry, isomerism',
+          'Reaction Kinetics: rate law, order of reaction, Arrhenius equation, activation energy',
+          'Gases: ideal gas law, van der Waals, partial pressure, Graham\'s law of effusion'
+        ],
+        style: 'Conceptual and calculation-based. Include reaction prediction, numerical stoichiometry, and mechanism understanding. Hard difficulty — NET Chemistry is known for tricky conceptual twists.',
+        distractors: 'similar compound names, wrong valency, reversed reaction direction, incorrect hybridisation'
+      },
+      'Biology': {
+        topics: [
+          'Cell Biology: prokaryote vs eukaryote, organelle functions, cell membrane structure, osmosis/diffusion, active transport',
+          'Genetics: Mendel\'s laws, dihybrid cross, co-dominance, sex-linked inheritance, DNA replication, transcription, translation, genetic code',
+          'Human Physiology: digestion enzymes and organs, respiratory system (ventilation, gas exchange), circulatory system (cardiac cycle, blood pressure), nervous system (reflex arc, neuron structure), hormonal system',
+          'Plant Biology: photosynthesis (light/dark reactions, Calvin cycle), transpiration, auxins, germination',
+          'Ecology: food chains/webs, biogeochemical cycles (carbon, nitrogen), population dynamics, ecosystems',
+          'Evolution: natural selection, adaptive radiation, speciation, evidence for evolution',
+          'Biotechnology: PCR, gel electrophoresis, cloning, GM organisms, CRISPR (conceptual)'
+        ],
+        style: 'Conceptual questions requiring understanding of processes, not just definitions. Include diagram-based reasoning in written form. Moderate to hard difficulty.',
+        distractors: 'similar-sounding biological terms, reversed process steps, incorrect organ assignments'
+      },
+      'English': {
+        topics: [
+          'Reading Comprehension: inference, main idea, author\'s tone, vocabulary in context',
+          'Grammar: tenses, modal verbs, passive voice transformation, reported speech, conditionals (0/1/2/3)',
+          'Vocabulary: synonyms, antonyms, contextual meaning, word forms (noun/verb/adjective)',
+          'Sentence Correction: spot and fix grammatical errors',
+          'Fill in the Blank: grammatically and contextually appropriate word choice',
+          'Analogies: semantic relationships'
+        ],
+        style: 'English language only — no science content. NUST English is straightforward but tests reading speed and vocabulary breadth. Moderate difficulty.',
+        distractors: 'near-synonyms with subtle meaning differences, grammatically correct but contextually inappropriate'
+      }
+    }
+  },
+  'GIKI': {
+    testName: 'GIKI Entry Test',
+    testDesc: 'The GIKI Entry Test is one of the hardest engineering entry tests in Pakistan. It is known for extremely analytical questions, deep problem-solving, and non-routine questions that cannot be solved by memorisation alone. Only the top few percent of FSc students succeed.',
+    subjects: {
+      'Mathematics': {
+        topics: [
+          'Calculus: differentiation (product, quotient, chain rule, implicit functions), integration (definite, substitution, by parts, areas under curves), limits and continuity',
+          'Algebra: polynomial equations, rational expressions, logarithmic/exponential equations, binomial theorem, mathematical induction',
+          'Permutations & Combinations: counting principles, multinomial theorem, stars and bars, derangements',
+          'Matrices & Determinants: matrix operations, determinants, solving 3×3 systems, Cramer\'s rule, rank',
+          'Analytic Geometry: conics (parabola, ellipse, hyperbola — equations, tangents, normals), locus problems',
+          'Trigonometry: proving complex identities, solving trig equations, inverse functions, product-to-sum formulas',
+          'Vectors: scalar/vector product, angle between vectors, projection, equations of lines and planes in 3D',
+          'Complex Numbers: modulus, argument, De Moivre\'s theorem, nth roots of unity',
+          'Differential Equations: first-order separable, linear first order with integrating factor'
+        ],
+        style: 'Very hard, multi-concept questions. GIKI Math requires genuine analytical thinking — no formula-plugging shortcut. Questions often have non-obvious solution paths. Full detailed working must be shown in explanation.',
+        distractors: 'results from a common wrong approach, algebraic errors in multi-step solutions, confusion between similar but distinct theorems'
+      },
+      'Physics': {
+        topics: [
+          'Mechanics: variable force motion, work done by non-constant forces, rotational dynamics (angular momentum, rolling without slipping), gravitation (orbital mechanics, escape velocity)',
+          'Fluids: Bernoulli\'s equation, Poiseuille\'s law, surface tension, viscosity',
+          'Oscillations & Waves: damped/forced oscillations, resonance, wave superposition, Doppler effect, shock waves',
+          'Thermodynamics: entropy changes, cyclic processes, efficiency of real engines, Maxwell\'s speed distribution (conceptual)',
+          'Electrostatics & Electrodynamics: Gauss\'s law applications, capacitor energy, RC circuits, RL circuits, LC oscillations',
+          'Optics: Brewster\'s angle, diffraction grating, resolving power, thin film interference',
+          'Modern Physics: Compton effect, pair production, nuclear reactions, radioactive decay kinetics, fission/fusion energy calculations'
+        ],
+        style: 'Extremely analytical. GIKI Physics questions often require deriving results rather than plugging in formulas. Numerical questions involve multi-step reasoning. Very hard difficulty.',
+        distractors: 'correct formula applied to wrong physical scenario, dimensionally consistent but wrong answers, sign convention errors'
+      },
+      'English': {
+        topics: [
+          'Vocabulary: advanced synonyms and antonyms, GRE-level word meaning, contextual usage',
+          'Grammar: complex sentence correction, parallel structure, dangling modifiers, pronoun reference, subject-verb agreement in complex sentences',
+          'Comprehension: analytical reading, inference, tone, logical implication',
+          'Sentence Completion: choose words that maintain logical and grammatical coherence',
+          'Critical Reasoning: evaluate argument strength, identify assumptions, logical conclusions'
+        ],
+        style: 'Advanced English. GIKI English is harder than most universities — vocabulary questions test words beyond common FSc syllabus. Grammar questions involve nuanced rules. No science content.',
+        distractors: 'near-synonyms with different connotations, grammatically valid but logically weak options'
+      }
+    }
+  },
+  'COMSATS': {
+    testName: 'COMSATS Entry Test',
+    testDesc: 'The COMSATS Entry Test is moderate in difficulty, following a structured MCQ format aligned with FSc/A-Level syllabus. It tests breadth of knowledge across core subjects with an emphasis on conceptual clarity and accurate calculation.',
+    subjects: {
+      'Mathematics': {
+        topics: [
+          'Algebra: quadratic equations, logarithms, sets and functions, polynomial division',
+          'Permutations & Combinations: basic counting, nPr, nCr, simple arrangement problems',
+          'Trigonometry: standard angles, basic identities, sine/cosine rule, area of triangle',
+          'Analytic Geometry: distance formula, midpoint, slope, equation of line and circle',
+          'Calculus: basic derivatives (power rule, trig functions, e^x, ln x), basic integration (antiderivatives, simple definite integrals)',
+          'Statistics & Probability: mean, median, mode, standard deviation, basic probability',
+          'Matrices: addition, multiplication, determinant (2×2, 3×3), inverse of 2×2 matrix'
+        ],
+        style: 'Moderate difficulty. Questions are directly based on FSc Part 1 and Part 2 syllabus. Include numerical problems with clear calculation steps. Avoid overly complex multi-step derivations.',
+        distractors: 'common arithmetic errors, wrong formula recall, sign mistakes, off-by-one in combinatorics'
+      },
+      'Physics': {
+        topics: [
+          'Kinematics: equations of motion, graphical analysis, projectile motion basics',
+          'Dynamics: Newton\'s laws, friction (static/kinetic), momentum conservation',
+          'Work & Energy: work-energy theorem, conservation of energy, power',
+          'Waves: transverse vs longitudinal, frequency/wavelength/speed relationship, sound',
+          'Electricity: Ohm\'s law, resistors in series/parallel, electric power, Kirchhoff\'s laws',
+          'Magnetism: magnetic force on current, electromagnetic induction basics',
+          'Optics: reflection, refraction (Snell\'s law), lenses and mirrors (basic ray diagrams)',
+          'Heat: specific heat, latent heat, thermal expansion, ideal gas laws'
+        ],
+        style: 'Moderate difficulty. Mix of conceptual and simple numerical. Questions should be solvable with FSc-level knowledge. Include units in numerical questions.',
+        distractors: 'wrong formula variant, unit mismatch, conceptual misconception common among FSc students'
+      },
+      'Chemistry': {
+        topics: [
+          'Periodic Table: periods, groups, periodic trends (atomic radius, ionisation energy, electronegativity, electron affinity)',
+          'Chemical Bonding: ionic bond formation, covalent bonding, Lewis structures, polarity, VSEPR shapes',
+          'Stoichiometry: mole calculations, balancing equations, concentration (molarity), dilution, percentage composition',
+          'Acids & Bases: Arrhenius/Brønsted-Lowry definitions, pH scale, neutralisation, buffer concept',
+          'Organic Chemistry: alkanes/alkenes/alkynes (naming, reactions), functional groups (alcohol, aldehyde, ketone, carboxylic acid, amine), substitution vs addition reactions',
+          'Electrochemistry: oxidation states, oxidation/reduction, galvanic cell, electrolysis basics',
+          'Chemical Equilibrium: Le Chatelier\'s principle, Kc expression, factors affecting equilibrium'
+        ],
+        style: 'Difficult. Balanced between conceptual and numerical. Include reaction equations where relevant. FSc syllabus-aligned.',
+        distractors: 'wrong valency, reversed reaction, similar compound names, incorrect IUPAC naming'
+      },
+      'English': {
+        topics: [
+          'Grammar: tenses (all forms), active/passive voice, direct/indirect speech, articles, prepositions, conjunctions, relative clauses',
+          'Vocabulary: synonyms, antonyms, commonly confused words (affect/effect, then/than, etc.)',
+          'Sentence Correction: identify grammatically incorrect part of a sentence',
+          'Fill in the Blank: select the most appropriate word/phrase',
+          'One Word Substitution: match a phrase to the single word that best describes it',
+          'Analogy: word pair relationships (big:small :: fast:?)'
+        ],
+        style: 'Straightforward English. FSc-level vocabulary and grammar. No science, no math — purely English language skills. Questions should be accessible but test careful reading.',
+        distractors: 'common grammar misconceptions, near-synonyms that differ in register or formality'
+      }
+    }
+  }
+};
+
+// ════════════════════════════════
+// PAGE ROUTING
+// ════════════════════════════════
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => {
+    p.classList.remove('active');
+    p.style.display = 'none';
+    p.style.opacity = '0';
+    p.style.transform = 'translateY(16px)';
+  });
+  const el = document.getElementById('page-' + id);
+  el.style.display = 'block';
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      el.classList.add('active');
+      el.style.opacity = '1';
+      el.style.transform = 'translateY(0)';
+    });
+  });
+  window.scrollTo({ top: 0 });
+}
+
+// ════════════════════════════════
+// CUSTOM GRADE PICKER
+// ════════════════════════════════
+function toggleGradePicker() {
+  const trigger = document.getElementById('gp-trigger');
+  trigger.classList.contains('open') ? closeGradePicker() : openGradePicker();
+}
+function openGradePicker() {
+  const trigger = document.getElementById('gp-trigger');
+  const panel = document.getElementById('gp-panel');
+  trigger.classList.add('open');
+  panel.classList.add('open');
+  panel.querySelectorAll('.gp-item').forEach((el, i) => {
+    el.style.animationDelay = (i * 18) + 'ms';
+  });
+}
+function closeGradePicker() {
+  document.getElementById('gp-trigger').classList.remove('open');
+  document.getElementById('gp-panel').classList.remove('open');
+}
+function selectGrade(el) {
+  const val = el.dataset.value;
+  document.querySelectorAll('.gp-item, .gp-entry-card').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('inp-grade').value = val;
+  const trigger = document.getElementById('gp-trigger');
+  trigger.querySelector('#gp-trigger-text').textContent = val === 'entry-test' ? 'Entry Test Preparation' : val;
+  trigger.classList.add('has-value');
+  const icon = document.getElementById('gp-icon');
+  if (val === 'entry-test') {
+    icon.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>`;
+  } else if (val.startsWith('College')) {
+    icon.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>`;
+  } else {
+    icon.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`;
+  }
+  closeGradePicker();
+  handleGradeChange(val);
+}
+document.addEventListener('click', function(e) {
+  const trigger = document.getElementById('gp-trigger');
+  const panel = document.getElementById('gp-panel');
+  if (trigger && panel && !trigger.contains(e.target) && !panel.contains(e.target)) {
+    closeGradePicker();
+  }
+});
+function handleGradeChange(val) {
+  const isEntry = val === 'entry-test';
+  state.entryTestMode = isEntry;
+  document.getElementById('entry-test-section').style.display = isEntry ? 'block' : 'none';
+  document.getElementById('regular-fields').style.display = isEntry ? 'none' : 'block';
+  document.getElementById('qtype-group').style.display = isEntry ? 'none' : 'block';
+  document.getElementById('normal-count-group').style.display = isEntry ? 'none' : 'block';
+  if (!isEntry) {
+    state.entryTestUniversity = '';
+    state.entryTestSubject = '';
+    state.mcqCount = 10;
+    document.querySelectorAll('.uni-pill').forEach(p => p.classList.remove('selected'));
+    document.getElementById('et-subject-group').style.display = 'none';
+    document.getElementById('et-count-group').style.display = 'none';
+    document.querySelectorAll('#normal-count-pills .count-pill').forEach(p => p.classList.remove('selected'));
+    const firstNormal = document.querySelector('#normal-count-pills .count-pill[data-count="10"]');
+    if (firstNormal) firstNormal.classList.add('selected');
+  } else {
+    state.mcqCount = 10;
+    document.getElementById('et-count-group').style.display = 'none';
+    document.querySelectorAll('#et-count-pills .count-pill').forEach(p => p.classList.remove('selected'));
+    const firstET = document.querySelector('#et-count-pills .count-pill[data-count="10"]');
+    if (firstET) firstET.classList.add('selected');
+  }
+}
+
+// ════════════════════════════════
+// UNIVERSITY / SUBJECT SELECTION
+// ════════════════════════════════
+function selectUniversity(el) {
+  document.querySelectorAll('.uni-pill').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+  state.entryTestUniversity = el.dataset.uni;
+  state.entryTestSubject = '';
+  const uniData = UNI_SUBJECT_MAP[state.entryTestUniversity];
+  const subjects = uniData ? Object.keys(uniData.subjects) : (UNI_SUBJECTS[state.entryTestUniversity] || []);
+  const pillGroup = document.getElementById('et-subject-pills');
+  pillGroup.innerHTML = subjects.map(s =>
+    `<div class="pill" data-subj="${s}" onclick="selectETSubject(this)">${s}</div>`
+  ).join('');
+  document.getElementById('et-subject-group').style.display = 'block';
+  document.getElementById('et-count-group').style.display = 'none';
+  state.mcqCount = 10;
+  document.querySelectorAll('#et-count-pills .count-pill').forEach(p => p.classList.remove('selected'));
+  const firstET = document.querySelector('#et-count-pills .count-pill[data-count="10"]');
+  if (firstET) firstET.classList.add('selected');
+}
+function selectETSubject(el) {
+  document.querySelectorAll('#et-subject-pills .pill').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+  state.entryTestSubject = el.dataset.subj;
+  document.getElementById('et-count-group').style.display = 'block';
+}
+function selectMCQCount(el, group) {
+  const groupId = group === 'et' ? 'et-count-pills' : 'normal-count-pills';
+  document.querySelectorAll(`#${groupId} .count-pill`).forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+  state.mcqCount = parseInt(el.dataset.count, 10);
+}
+document.querySelectorAll('#type-pills .pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('#type-pills .pill').forEach(p => p.classList.remove('selected'));
+    pill.classList.add('selected');
+    state.qType = pill.dataset.type;
+  });
+});
+
+// ════════════════════════════════
+// TOAST
+// ════════════════════════════════
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+// ════════════════════════════════
+// EXIT EXAM MODAL
+// ════════════════════════════════
+function openExitModal() { document.getElementById('exit-modal').classList.add('open'); }
+function closeExitModal() { document.getElementById('exit-modal').classList.remove('open'); }
+function confirmExitExam() {
+  closeExitModal();
+  clearInterval(state.timerInterval);
+  state.questions = [];
+  state.answers = [];
+  state.currentQ = 0;
+  ['dot1','dot2','dot3'].forEach((id,i) => {
+    document.getElementById(id).className = 'step-dot ' + (i===0?'active':'pending');
+  });
+  showPage('profile');
+}
+
+// ════════════════════════════════
+// START EXAM
+// ════════════════════════════════
+async function startExam() {
+  state.name = document.getElementById('inp-name').value.trim();
+  state.grade = document.getElementById('inp-grade').value;
+
+  if (!state.name) { showToast('Please enter your name.'); return; }
+  if (!state.grade) { showToast('Please select your class / grade.'); return; }
+
+  if (state.entryTestMode) {
+    if (!state.entryTestUniversity) { showToast('Please select a university.'); return; }
+    if (!state.entryTestSubject) { showToast('Please select a subject for the entry test.'); return; }
+    state.subject = `${state.entryTestUniversity} Entry Test`;
+    state.chapter = state.entryTestSubject;
+    state.qType = 'mcq';
+  } else {
+    state.subject = document.getElementById('inp-subject').value.trim();
+    state.chapter = document.getElementById('inp-chapter').value.trim();
+    if (!state.subject) { showToast('Please enter your subject.'); return; }
+    if (!state.chapter) { showToast('Please enter a chapter or topic.'); return; }
+  }
+
+  document.getElementById('dot2').className = 'step-dot active';
+  showPage('exam');
+  showSkeleton();
+  startTimer();
+
+  try {
+    await fetchQuestions();
+    renderQuestion();
+  } catch(e) {
+    document.getElementById('exam-body').innerHTML = `
+      <div style="text-align:center;padding:60px 20px;color:var(--terracotta);font-family:var(--font-head);">
+        <div style="font-size:1.3rem;font-weight:700;margin-bottom:8px;">Could not generate questions</div>
+        <div style="color:var(--charcoal-light);font-size:0.95rem;">${e.message || 'Please try again.'}</div>
+        <button class="btn btn-outline" style="margin-top:28px;" onclick="confirmExitExam()">← Go back</button>
+      </div>`;
+  }
+}
+
+// ════════════════════════════════
+// SKELETON
+// ════════════════════════════════
+function showSkeleton() {
+  document.getElementById('exam-body').innerHTML = `
+    <div class="skeleton-card">
+      <div class="skel-line w40"></div>
+      <div class="skel-line w80" style="height:24px;margin-top:20px;"></div>
+      <div class="skel-line w60"></div>
+      <div class="skel-opts">
+        <div class="skel-opt"></div>
+        <div class="skel-opt" style="animation-delay:0.1s"></div>
+        <div class="skel-opt" style="animation-delay:0.2s"></div>
+        <div class="skel-opt" style="animation-delay:0.3s"></div>
+      </div>
+    </div>`;
+}
+
+// ════════════════════════════════
+// API — FETCH QUESTIONS
+// ════════════════════════════════
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhrenV1dmNjanJwZ25icHV1YnprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3MzE0NjUsImV4cCI6MjA4OTMwNzQ2NX0.lxqcgcl7HOXEmKbFXCj82lZDt3xHLthjpuQYgDDwCEY';
+
+// FIX: Wrapper with exponential backoff retry — avoids hammering the endpoint
+async function callGroq(messages, maxTok) {
+  const body = JSON.stringify({
+    messages,
+    maxTokens: maxTok,
+    temperature: state.entryTestMode ? 0.25 : 0.65
+  });
+  const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+  };
+  const url = 'https://hkzuuvccjrpgnbpuubzk.supabase.co/functions/v1/xectraai_function';
+
+  let lastErr;
+  // Attempt up to 2 tries with backoff: 0ms then 2000ms
+  const delays = [0, 2000];
+  for (let i = 0; i < delays.length; i++) {
+    if (delays[i] > 0) await new Promise(r => setTimeout(r, delays[i]));
+    try {
+      const res = await fetch(url, { method: 'POST', headers, body });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        lastErr = new Error(err?.error?.message || `Backend error ${res.status}`);
+        // Don't retry 4xx errors other than 429 (rate limit)
+        if (res.status >= 400 && res.status < 500 && res.status !== 429) throw lastErr;
+        continue;
+      }
+      const data = await res.json();
+      return {
+        choices: [{
+          message: {
+            content: typeof data.result === 'string' ? data.result : JSON.stringify(data.result)
+          }
+        }]
+      };
+    } catch (e) {
+      lastErr = e;
+    }
+  }
+  throw lastErr;
+}
+
+// FIX: JSON extractor — unchanged from original, kept intact
+function extractJSON(raw) {
+  let text = raw.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
+  let start = text.indexOf('[');
+  let end   = text.lastIndexOf(']');
+  if (start !== -1 && end !== -1 && end > start) {
+    try {
+      const parsed = JSON.parse(text.slice(start, end + 1));
+      if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'object' && parsed[0].question) {
+        return text.slice(start, end + 1);
+      }
+    } catch(e) {}
+  }
+  if (start !== -1) {
+    const partial = text.slice(start + 1);
+    const objects = [];
+    let depth = 0, inStr = false, objStart = -1, escaped = false;
+    for (let i = 0; i < partial.length; i++) {
+      const ch = partial[i];
+      if (escaped) { escaped = false; continue; }
+      if (ch === '\\') { escaped = true; continue; }
+      if (ch === '"') { inStr = !inStr; continue; }
+      if (inStr) continue;
+      if (ch === '{') { if (depth === 0) objStart = i; depth++; }
+      else if (ch === '}') {
+        depth--;
+        if (depth === 0 && objStart !== -1) {
+          try { const obj = JSON.parse(partial.slice(objStart, i + 1)); objects.push(obj); } catch(e) {}
+          objStart = -1;
+        }
+      }
+    }
+    if (objects.length > 0) return JSON.stringify(objects);
+  }
+  let depth2 = 0, inStr2 = false, objStart2 = -1, escaped2 = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (escaped2) { escaped2 = false; continue; }
+    if (ch === '\\') { escaped2 = true; continue; }
+    if (ch === '"') { inStr2 = !inStr2; continue; }
+    if (inStr2) continue;
+    if (ch === '{') { if (depth2 === 0) objStart2 = i; depth2++; }
+    else if (ch === '}') {
+      depth2--;
+      if (depth2 === 0 && objStart2 !== -1) {
+        try {
+          const obj = JSON.parse(text.slice(objStart2, i + 1));
+          if (obj.question) return JSON.stringify([obj]);
+        } catch(e) {}
+        objStart2 = -1;
+      }
+    }
+  }
+  throw new Error('No valid JSON found in response.');
+}
+
+function parseQuestions(raw) {
+  if (!raw || raw.trim() === '') throw new Error('Empty response from AI model.');
+  let jsonStr;
+  try { jsonStr = extractJSON(raw); }
+  catch(e) { throw new Error('AI response was cut off. Please try again.'); }
+  let arr;
+  try { arr = JSON.parse(jsonStr); }
+  catch(e) { throw new Error('AI response format was invalid. Please try again.'); }
+  if (!Array.isArray(arr)) arr = [arr];
+  const valid = arr.filter(q =>
+    q &&
+    typeof q.question === 'string' && q.question.trim().length > 5 &&
+    typeof q.correct_answer === 'string' && q.correct_answer.trim().length > 0
+  );
+  if (valid.length === 0) throw new Error('No valid questions in response. Please try again.');
+  return valid;
+}
+
+async function fetchQuestions() {
+  // FIX: Return cached result if identical parameters were used before
+  const cacheKey = _cacheKey();
+  if (_questionCache.has(cacheKey)) {
+    const cached = _questionCache.get(cacheKey);
+    state.questions = cached;
+    state.answers   = new Array(cached.length).fill(null);
+    state.currentQ  = 0;
+    return;
+  }
+
+  const n = state.mcqCount;
+  function diffGuide(count) {
+    const e = Math.round(count * 0.4);
+    const m = Math.round(count * 0.35);
+    const h = count - e - m;
+    return `first ${e} questions: easy, next ${m} questions: medium, last ${h} questions: hard`;
+  }
+
+  let messages;
+  const maxTok = 8000;
+
+  if (state.entryTestMode) {
+    const uni  = state.entryTestUniversity;
+    const subj = state.entryTestSubject;
+    const uniData = UNI_SUBJECT_MAP[uni];
+    const subjData = uniData?.subjects?.[subj];
+    if (!subjData) throw new Error(`No data for ${uni} — ${subj}. Please try again.`);
+    const topicList = Array.isArray(subjData.topics)
+      ? subjData.topics.map((t,i) => `${i+1}. ${t}`).join('\n')
+      : subjData.topics;
+    const systemMsg =
+`You are an expert Pakistani university entry test question generator specialising in ${subj} for the ${uniData.testName}.
+CRITICAL CONSTRAINT: You generate ONLY ${subj} questions. Any question that is not purely about ${subj} is a failure.
+You output ONLY a valid JSON array. No text before or after the array.`;
+    const userMsg =
+`Generate exactly ${n} MCQ questions for: ${uniData.testName}
+Subject: ${subj} (ONLY ${subj} — zero content from any other subject)
+Test context: ${uniData.testDesc}
+
+TOPICS TO COVER (distribute evenly across all ${n} questions):
+${topicList}
+
+QUESTION STYLE: ${subjData.style}
+DISTRACTOR STRATEGY: ${subjData.distractors}
+
+DIFFICULTY ORDER: ${diffGuide(n)}
+
+ABSOLUTE RULES:
+1. Every question tests ${subj} ONLY. No exceptions.
+2. Each question has exactly 4 options.
+3. correct_answer must be the exact string of one of the 4 options.
+4. Explanations must be clear and educational.
+5. Questions must reflect actual ${uniData.testName} difficulty — not textbook definitions.
+6. Output ONLY the JSON array below. Nothing else.
+
+[
+  {
+    "question": "question text here",
+    "type": "mcq",
+    "options": ["A text", "B text", "C text", "D text"],
+    "correct_answer": "exact text of correct option",
+    "explanation": "clear explanation with working if numerical"
+  }
+]`;
+    messages = [
+      { role: 'system', content: systemMsg },
+      { role: 'user',   content: userMsg   }
+    ];
+  } else {
+    const typeInstruction = {
+      mixed:   `Include a mix of MCQ, written, and logic questions across all ${n} questions.`,
+      mcq:     `All ${n} questions must be MCQ with exactly 4 options each.`,
+      written: `All ${n} questions must be open-ended written questions (no options array needed).`,
+      logic:   `All ${n} questions must be coding logic or problem-solving questions (no options needed).`
+    }[state.qType] || `Generate ${n} mixed questions.`;
+    const userMsg =
+`Generate exactly ${n} exam questions for a ${state.grade} student.
+Subject: "${state.subject}"
+Topic: "${state.chapter}"
+
+${typeInstruction}
+
+Output ONLY a JSON array, nothing else:
+[
+  {
+    "question": "...",
+    "type": "mcq" | "written" | "logic",
+    "options": ["A","B","C","D"] or [],
+    "correct_answer": "...",
+    "explanation": "..."
+  }
+]`;
+    messages = [{ role: 'user', content: userMsg }];
+  }
+
+  const data = await callGroq(messages, maxTok);
+  const raw = data?.choices?.[0]?.message?.content || '';
+  const questions = parseQuestions(raw);
+
+  if (questions.length === 0) throw new Error('No valid questions generated. Please try again.');
+
+  // FIX: Store in cache (cap cache at 30 entries to avoid memory growth)
+  if (_questionCache.size >= 30) {
+    const firstKey = _questionCache.keys().next().value;
+    _questionCache.delete(firstKey);
+  }
+  _questionCache.set(cacheKey, questions);
+
+  state.questions = questions;
+  state.answers   = new Array(questions.length).fill(null);
+  state.currentQ  = 0;
+}
+
+// ════════════════════════════════
+// RENDER QUESTION
+// ════════════════════════════════
+function renderQuestion() {
+  const q = state.questions[state.currentQ];
+  const total = state.questions.length;
+  const num = state.currentQ + 1;
+
+  document.getElementById('prog-label').textContent = `Question ${num} of ${total}`;
+  document.getElementById('prog-fill').style.width = `${(num / total) * 100}%`;
+  document.getElementById('next-btn').textContent = num === total ? 'Finish exam' : 'Next \u2192';
+
+  const hint = document.getElementById('footer-hint');
+  if (hint) hint.textContent = num === total ? 'Last question — finish when ready' : 'Select an answer or skip to continue';
+
+  let answerHTML = '';
+  if (q.type === 'mcq' && q.options && q.options.length) {
+    const letters = ['A','B','C','D'];
+    answerHTML = `<div class="mcq-options" id="mcq-opts">` +
+      q.options.map((opt,i) => `<button class="opt-btn${state.answers[state.currentQ] === opt ? ' selected' : ''}" data-val="${escHtml(opt)}" onclick="selectMCQ(this,'${escHtml(opt).replace(/'/g,"\\'")}')"><span class="opt-letter">${letters[i]}</span>${escHtml(opt)}</button>`).join('') +
+      `</div>`;
+  } else {
+    const saved = state.answers[state.currentQ] || '';
+    answerHTML = `<textarea class="answer-area" id="written-ans" placeholder="Write your answer here…" oninput="saveWritten(this.value)">${escHtml(saved)}</textarea>`;
+  }
+
+  document.getElementById('exam-body').innerHTML = `
+    <div class="q-card">
+      <div class="q-label">Question ${num}</div>
+      <div class="q-text">${escHtml(q.question)}</div>
+      ${answerHTML}
+    </div>`;
+}
+
+function escHtml(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function selectMCQ(btn, val) {
+  state.answers[state.currentQ] = val;
+  document.querySelectorAll('#mcq-opts .opt-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+function saveWritten(val) {
+  state.answers[state.currentQ] = val;
+}
+
+// ════════════════════════════════
+// NEXT / FINISH
+// ════════════════════════════════
+function nextQuestion() {
+  const ta = document.getElementById('written-ans');
+  if (ta) state.answers[state.currentQ] = ta.value.trim();
+  if (state.currentQ === state.questions.length - 1) {
+    finishExam();
+  } else {
+    state.currentQ++;
+    renderQuestion();
+  }
+}
+function finishExam() {
+  clearInterval(state.timerInterval);
+  document.getElementById('dot3').className = 'step-dot active';
+  showPage('results');
+  buildResults();
+}
+
+// ════════════════════════════════
+// TIMER
+// ════════════════════════════════
+function startTimer() {
+  state.timerSecs = 0;
+  clearInterval(state.timerInterval);
+  state.timerInterval = setInterval(() => {
+    state.timerSecs++;
+    const m = Math.floor(state.timerSecs / 60);
+    const s = state.timerSecs % 60;
+    document.getElementById('timer-display').textContent = `${m}:${s.toString().padStart(2,'0')}`;
+  }, 1000);
+}
+
+// ════════════════════════════════
+// RESULTS
+// ════════════════════════════════
+function buildResults() {
+  let correct = 0, wrong = 0, skipped = 0;
+  state.questions.forEach((q, i) => {
+    const ans = state.answers[i];
+    if (!ans || ans.trim() === '') { skipped++; }
+    else if (q.type === 'mcq') {
+      if (normalize(ans) === normalize(q.correct_answer)) correct++; else wrong++;
+    } else {
+      if (ans.trim().length > 3) correct++; else wrong++;
+    }
+  });
+  const pct = Math.round((correct / state.questions.length) * 100);
+  const circumference = 364;
+  const offset = circumference - (pct / 100) * circumference;
+  const circle = document.getElementById('score-circle');
+  const pctEl = document.getElementById('score-pct');
+  setTimeout(() => {
+    circle.style.strokeDashoffset = offset;
+    let current = 0;
+    const step = Math.max(1, Math.ceil(pct / 40));
+    const counter = setInterval(() => {
+      current = Math.min(current + step, pct);
+      pctEl.textContent = current + '%';
+      if (current >= pct) clearInterval(counter);
+    }, 28);
+  }, 200);
+  document.getElementById('m-correct').textContent = correct;
+  document.getElementById('m-wrong').textContent = wrong;
+  document.getElementById('m-skipped').textContent = skipped;
+  setTimeout(() => {
+    document.querySelectorAll('.metric-card').forEach(c => c.classList.add('anim'));
+  }, 300);
+  const titles = {
+    high: 'Excellent work! You nailed it.',
+    mid: 'Good effort! More to strengthen.',
+    low: 'Keep going! Every review counts.'
+  };
+  document.getElementById('results-title').textContent = pct >= 75 ? titles.high : pct >= 50 ? titles.mid : titles.low;
+  const list = document.getElementById('review-list');
+  list.innerHTML = state.questions.map((q, i) => {
+    const ans = state.answers[i];
+    const isEmpty = !ans || ans.trim() === '';
+    let status = 'skipped';
+    if (!isEmpty) {
+      if (q.type === 'mcq') {
+        status = normalize(ans) === normalize(q.correct_answer) ? 'correct' : 'wrong';
+      } else {
+        status = ans.trim().length > 3 ? 'correct' : 'wrong';
+      }
+    }
+    const yourAns = isEmpty ? '<em style="color:var(--charcoal-light);">Not answered</em>' : escHtml(ans);
+    return `<div class="review-item ${status}">
+      <div style="font-size:0.75rem;font-weight:700;font-family:var(--font-head);color:var(--charcoal-light);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">Question ${i+1} &mdash; ${status.charAt(0).toUpperCase()+status.slice(1)}</div>
+      <div class="review-q">${escHtml(q.question)}</div>
+      <div class="review-answers">
+        <div class="ans-row"><span class="ans-badge yours">Your answer</span><span>${yourAns}</span></div>
+        <div class="ans-row"><span class="ans-badge correct-lbl">Correct</span><span>${escHtml(q.correct_answer)}</span></div>
+      </div>
+      <div class="review-exp">${escHtml(q.explanation)}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('sh-name').textContent = state.name;
+  document.getElementById('sh-grade').textContent = state.entryTestMode ? `${state.entryTestUniversity} Entry Test` : state.grade;
+  document.getElementById('sh-subject').textContent = state.entryTestMode ? state.entryTestSubject : state.subject;
+  document.getElementById('sh-chapter').textContent = state.entryTestMode ? `${state.entryTestUniversity} — ${state.entryTestSubject}` : state.chapter;
+  document.getElementById('sh-score').textContent = pct + '%';
+  document.getElementById('sh-correct').textContent = correct;
+  document.getElementById('sh-wrong').textContent = wrong;
+  document.getElementById('sh-skipped').textContent = skipped;
+}
+
+function normalize(str) {
+  return String(str || '').toLowerCase().replace(/[^a-z0-9]/g,'').trim();
+}
+
+// ════════════════════════════════
+// ACTIONS
+// ════════════════════════════════
+function tryAgain() {
+  state.questions = [];
+  state.answers = [];
+  state.currentQ = 0;
+  state.entryTestMode = false;
+  state.entryTestUniversity = '';
+  state.entryTestSubject = '';
+  state.mcqCount = 10;
+  clearInterval(state.timerInterval);
+  ['dot1','dot2','dot3'].forEach((id,i) => {
+    document.getElementById(id).className = 'step-dot ' + (i===0?'active':'pending');
+  });
+  document.getElementById('inp-grade').value = '';
+  const trigger = document.getElementById('gp-trigger');
+  if (trigger) {
+    trigger.classList.remove('has-value','open');
+    trigger.querySelector('#gp-trigger-text').textContent = 'Select your grade';
+    document.getElementById('gp-icon').innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>`;
+    document.querySelectorAll('.gp-item,.gp-entry-card').forEach(e => e.classList.remove('selected'));
+  }
+  document.getElementById('entry-test-section').style.display = 'none';
+  document.getElementById('regular-fields').style.display = 'block';
+  document.getElementById('qtype-group').style.display = 'block';
+  document.getElementById('et-subject-group').style.display = 'none';
+  document.querySelectorAll('.uni-pill').forEach(p => p.classList.remove('selected'));
+  document.querySelectorAll('#et-subject-pills .pill').forEach(p => p.classList.remove('selected'));
+  showPage('profile');
+}
+function openShareModal() { document.getElementById('share-modal').classList.add('open'); }
+function closeShareModal() { document.getElementById('share-modal').classList.remove('open'); }
+document.getElementById('share-modal').addEventListener('click', function(e){ if(e.target===this) closeShareModal(); });
+document.getElementById('exit-modal').addEventListener('click', function(e){ if(e.target===this) closeExitModal(); });
+
+// ════════════════════════════════
+// AUTH HELPERS
+// ════════════════════════════════
+
+// FIX: setAuthLoading now works for both login-btn and signup-btn
+function setAuthLoading(btnId, loading, label) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  btn.disabled = loading;
+  btn.textContent = loading ? 'Please wait…' : label;
+}
+
+function togglePassword(id, span) {
+  const el = document.getElementById(id);
+  if (el.type === 'password') { el.type = 'text'; span.textContent = 'Hide'; }
+  else { el.type = 'password'; span.textContent = 'Show'; }
+}
+
+function initUserEnv(name) {
+  document.getElementById('nav-user').style.display = 'flex';
+  document.getElementById('nav-greeting').textContent = `Hi, ${name}`;
+  document.getElementById('inp-name').value = name;
+}
+
+// ════════════════════════════════
+// AUTH — SIGNUP
+// ════════════════════════════════
+async function handleSignup() {
+  // FIX: Prevent double-submission
+  if (_authInFlight) return;
+
+  const name    = document.getElementById('reg-name').value.trim();
+  const email   = document.getElementById('reg-email').value.trim();
+  const pass    = document.getElementById('reg-pass').value;
+  const confirm = document.getElementById('reg-confirm').value;
+
+  if (!name || !email || !pass) return showToast('Please fill all fields.');
+  if (pass !== confirm)         return showToast('Passwords do not match.');
+  if (pass.length < 6)          return showToast('Password must be at least 6 characters.');
+
+  _authInFlight = true;
+  setAuthLoading('signup-btn', true, 'Sign Up →');
+
+  try {
+    const { data, error } = await supabaseClient.auth.signUp({
+      email,
+      password: pass,
+      options: { data: { full_name: name } }
+    });
+
+    if (error) {
+      if (error.message.toLowerCase().includes('already registered')) {
+        showToast('Account already exists. Please log in.');
+        showPage('login');
+        return;
+      }
+      showToast(error.message);
+      return;
+    }
+
+    if (data.session) {
+      // Email confirmation is OFF — session returned immediately
+      const userName = data.user?.user_metadata?.full_name || email;
+      initUserEnv(userName);
+      showToast('Welcome to XectraAI!');
+      showPage('landing');
+      return;
+    }
+
+    // Email confirmation is ON — session is null
+    showToast('Check your email to confirm your account.');
+    showPage('login');
+
+  } catch(e) {
+    showToast('Something went wrong. Please try again.');
+    console.error('Signup error:', e);
+  } finally {
+    _authInFlight = false;
+    setAuthLoading('signup-btn', false, 'Sign Up →');
+  }
+}
+
+// ════════════════════════════════
+// AUTH — LOGIN
+// ════════════════════════════════
+async function handleLogin() {
+  // FIX: Prevent double-submission
+  if (_authInFlight) return;
+
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-pass').value;
+
+  if (!email || !pass) return showToast('Please fill all fields.');
+
+  _authInFlight = true;
+  setAuthLoading('login-btn', true, 'Log In →');
+
+  try {
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
+
+    if (error) {
+      if (error.message.toLowerCase().includes('email not confirmed')) {
+        showToast('Please confirm your email first.');
+        return;
+      }
+      if (error.message.toLowerCase().includes('invalid login credentials')) {
+        showToast('Wrong email or password.');
+        return;
+      }
+      showToast(error.message);
+      return;
+    }
+
+    const name = data.user?.user_metadata?.full_name || email;
+    initUserEnv(name);
+    showPage('landing');
+
+  } catch(e) {
+    showToast('Something went wrong. Please try again.');
+    console.error('Login error:', e);
+  } finally {
+    _authInFlight = false;
+    setAuthLoading('login-btn', false, 'Log In →');
+  }
+}
+
+// ════════════════════════════════
+// AUTH — GOOGLE OAUTH
+// ════════════════════════════════
+async function loginWithGoogle() {
+  if (_authInFlight) return;
+  const { error } = await supabaseClient.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: 'https://xectraai.netlify.app' }
+  });
+  if (error) showToast('Google login failed. Try again.');
+}
+
+async function logout() {
+  await supabaseClient.auth.signOut();
+  document.getElementById('nav-user').style.display = 'none';
+  showPage('login');
+}
+
+// ════════════════════════════════
+// INIT — single authoritative entry point
+// FIX: onAuthStateChange registered exactly once, outside DOMContentLoaded
+// to prevent duplicate listener accumulation across navigations
+// ════════════════════════════════
+
+// Register the auth state listener exactly once at module level
+// This handles Google OAuth redirect callbacks reliably
+let _authListenerRegistered = false;
+function _ensureAuthListener() {
+  if (_authListenerRegistered) return;
+  _authListenerRegistered = true;
+  supabaseClient.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+      const name = session.user?.user_metadata?.full_name ||
+                   session.user?.user_metadata?.name ||
+                   session.user?.email;
+      initUserEnv(name);
+      // Only navigate to landing if we're currently on the login/signup page
+      const currentlyOnAuth = document.getElementById('page-login').classList.contains('active') ||
+                              document.getElementById('page-signup').classList.contains('active');
+      if (currentlyOnAuth) showPage('landing');
+    }
+    if (event === 'SIGNED_OUT') {
+      document.getElementById('nav-user').style.display = 'none';
+      showPage('login');
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  _ensureAuthListener();
+
+  // Restore session on page load (covers refresh + OAuth redirect)
+  const { data: { session } } = await supabaseClient.auth.getSession();
+
+  if (session) {
+    const name = session.user?.user_metadata?.full_name ||
+                 session.user?.user_metadata?.name ||
+                 session.user?.email;
+    initUserEnv(name);
+    showPage('landing');
+  } else {
+    showPage('login');
+  }
+});
+</script>
+</body>
+</html>
