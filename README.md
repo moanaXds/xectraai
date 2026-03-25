@@ -129,6 +129,8 @@ JSON Response → Rendered Exam
 | Landing Page | Exam Setup | Results |
 |---|---|---|
 | Clean animated hero | University + subject picker | Score ring + review |
+<img width="1682" height="855" alt="image" src="https://github.com/user-attachments/assets/e69c9ef8-96df-4591-9289-bffe8d0b3f05" />
+<img width="1541" height="823" alt="image" src="https://github.com/user-attachments/assets/0c1a4e84-1ad6-4af9-b055-901dd8566cda" />
 
 </div>
 
