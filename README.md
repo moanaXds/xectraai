@@ -19,9 +19,9 @@
 
 ---
 
-## ✨ What is XectraAI?
+## What is XectraAI?
 
-**XectraAI** is a free AI-powered exam preparation platform built specifically for **Pakistani university students**. It generates personalised, exam-level MCQs tailored to your selected university, subject, and difficulty — in seconds.
+**XectraAI** is a free AI-powered exam preparation platform built specifically for **Pakistani university students**. It generates personalised, exam-level MCQs tailored to your selected university, subject, and difficulty in seconds.
 
 Whether you're preparing for **FAST NU**, **NUST NET**, **GIKI**, or **COMSATS** entry tests, XectraAI builds a custom exam and tells you exactly where to improve.
 
@@ -199,7 +199,7 @@ const supabaseClient = createClient(
 
 <img src="https://github.com/moanaXds.png" width="100" style="border-radius:50%"/>
 
-**Moana Hamid**
+**Muanna Hamid**
 *Data Science Student @ FAST NUCES Islamabad*
 
 [![GitHub](https://img.shields.io/badge/GitHub-moanaXds-181717?style=for-the-badge&logo=github)](https://github.com/moanaXds)
