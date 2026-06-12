@@ -1,12 +1,12 @@
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=E8724A&height=200&section=header&text=XectraAI&fontSize=80&fontColor=ffffff&animation=fadeIn&fontAlignY=38&desc=Know%20Exactly%20How%20Ready%20You%20Are&descAlignY=55&descAlign=50&descSize=20" width="100%"/>
+<img src="https://capsule-render.vercel.app/api?type=waving&color=E8724A&height=200&section=header&text=Raah%20Nxt&fontSize=80&fontColor=ffffff&animation=fadeIn&fontAlignY=38&desc=Know%20Exactly%20How%20Ready%20You%20Are&descAlignY=55&descAlign=50&descSize=20" width="100%"/>
 
 <br/>
 
-[![Live Demo](https://img.shields.io/badge/🌐%20Live%20Demo-xectraai.netlify.app-E8724A?style=for-the-badge&logoColor=white)](https://xectraai.netlify.app)
-[![GitHub Stars](https://img.shields.io/github/stars/moanaXds/xectraai?style=for-the-badge&color=E8724A)](https://github.com/moanaXds/xectraai/stargazers)
-[![GitHub Forks](https://img.shields.io/github/forks/moanaXds/xectraai?style=for-the-badge&color=7BAE8A)](https://github.com/moanaXds/xectraai/network)
+[![Live Demo](https://img.shields.io/badge/🌐%20Live%20Demo-raahnxt.netlify.app-E8724A?style=for-the-badge&logoColor=white)](https://raahnxt.netlify.app)
+[![GitHub Stars](https://img.shields.io/github/stars/moanaXds/Raah-Nxt?style=for-the-badge&color=E8724A)](https://github.com/moanaXds/Raah-Nxt/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/moanaXds/Raah-Nxt?style=for-the-badge&color=7BAE8A)](https://github.com/moanaXds/Raah-Nxt/network)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 
 <br/>
@@ -19,11 +19,11 @@
 
 ---
 
-## What is XectraAI?
+## What is Raah Nxt?
 
-**XectraAI** is a free AI-powered exam preparation platform built specifically for **Pakistani university students**. It generates personalised, exam-level MCQs tailored to your selected university, subject, and difficulty in seconds.
+**Raah Nxt** is a free AI-powered exam preparation platform built specifically for **Pakistani university students**. It generates personalised, exam-level MCQs tailored to your selected university, subject, and difficulty in seconds.
 
-Whether you're preparing for **FAST NU**, **NUST NET**, **GIKI**, or **COMSATS** entry tests, XectraAI builds a custom exam and tells you exactly where to improve.
+Whether you're preparing for **FAST NU**, **NUST NET**, **GIKI**, or **COMSATS** entry tests, Raah Nxt builds a custom exam and tells you exactly where to improve.
 
 ---
 
@@ -106,7 +106,7 @@ User Browser
      ▼
 index.html (Frontend)
      │
-     │  POST /functions/v1/xectraai_function
+     │  POST /functions/v1/raahnxt_function
      ▼
 Supabase Edge Function (Deno)
      │
@@ -139,16 +139,16 @@ JSON Response → Rendered Exam
 ## 🚦 Getting Started
 
 ### Option 1 — Just use it
-Visit **[xectraai.netlify.app](https://xectraai.netlify.app)** — no installation needed.
+Visit **[raahnxt.netlify.app](https://raahnxt.netlify.app)** — no installation needed.
 
 ### Option 2 — Run locally
 
 ```bash
 # Clone the repo
-git clone https://github.com/moanaXds/xectraai.git
+git clone https://github.com/moanaXds/Raah-Nxt.git
 
 # Open in VS Code
-cd xectraai
+cd Raah-Nxt
 code .
 
 # Open index.html with Live Server
@@ -164,7 +164,7 @@ code .
 To run your own instance:
 
 1. Create a [Supabase](https://supabase.com) project
-2. Create an Edge Function named `xectraai_function`
+2. Create an Edge Function named `raahnxt_function`
 3. Add `GROQ_API_KEY` as a Supabase secret
 4. Get a free [Groq API key](https://console.groq.com)
 5. Update these values in `index.html`:
@@ -219,6 +219,6 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 
 <img src="https://capsule-render.vercel.app/api?type=waving&color=E8724A&height=120&section=footer&animation=fadeIn" width="100%"/>
 
-**If XectraAI helped you — drop a ⭐ on the repo. It means a lot.**
+**If Raah Nxt helped you — drop a ⭐ on the repo. It means a lot.**
 
 </div>
