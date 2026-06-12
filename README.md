@@ -4,7 +4,7 @@
 
 <br/>
 
-[![Live Demo](https://img.shields.io/badge/🌐%20Live%20Demo-raahnxt.netlify.app-E8724A?style=for-the-badge&logoColor=white)](https://raahnxt.netlify.app)
+[![Live Demo](https://img.shields.io/badge/🌐%20Live%20Demo-raahnxt.vercel.app-E8724A?style=for-the-badge&logoColor=white)](https://raahnxt.netlify.app)
 [![GitHub Stars](https://img.shields.io/github/stars/moanaXds/Raah-Nxt?style=for-the-badge&color=E8724A)](https://github.com/moanaXds/Raah-Nxt/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/moanaXds/Raah-Nxt?style=for-the-badge&color=7BAE8A)](https://github.com/moanaXds/Raah-Nxt/network)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
